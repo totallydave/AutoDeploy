@@ -86,7 +86,7 @@ class IndexController extends AbstractActionController
                       . rtrim($commit->message, "\n") . "\n";
             }
         }
-        // test
+
         $log .= $vcs->getLog();
 
         $this->log($log);
@@ -152,6 +152,8 @@ class IndexController extends AbstractActionController
      * @param \stdClass $request
      * @param boolean $error
      * @return void
+     *
+     * @throws InvalidArgumentException
      */
     protected function mailLog($message = '', \stdClass $request)
     {
@@ -186,6 +188,9 @@ class IndexController extends AbstractActionController
         $mail->send($recipients, $subject, $message);
     }
 
+    /**
+     * @return \Zend_Application
+     */
     protected function getApplication()
     {
         if ($this->application === null) {
