@@ -67,7 +67,9 @@ class Git extends Vcs implements VcsInterface
     protected function findProjectRoot()
     {
         $config = $this->getConfig();
-        $dir = realpath(APPLICATION_ROOT);
+
+        chdir(dirname(__DIR__));
+        $dir = realpath(dirname(__DIR__));
 
         while ($dir) {
             $gitConfig = $dir . DIRECTORY_SEPARATOR
@@ -89,6 +91,7 @@ class Git extends Vcs implements VcsInterface
 
             // lets move up a level
             $dir = realpath($dir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
+            chdir($dir);
         }
 
         return $dir;
