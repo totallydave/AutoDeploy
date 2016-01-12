@@ -1,0 +1,40 @@
+{
+    "name": "totallydave/auto-deploy",
+    "type": "library",
+    "description": "Auto deployment module for Zend Framework 2",
+    "keywords": ["Zend Framework 2", "auto","deploy", "web hook", "module"],
+    "homepage": "https://github.com/totallydave/AutoDeploy",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dave King",
+            "email": "dave@totallycommunications.com",
+            "homepage": "https://github.com/totallydave",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/totallydave/auto-deploy/issues"
+    },
+    "require": {
+        "php": ">=5.4.0",
+        "zendframework/zend-config": "~2.3",
+        "zendframework/zend-escaper": "~2.3",
+        "zendframework/zend-form": "~2.3",
+        "zendframework/zend-i18n": "~2.3",
+        "zendframework/zend-loader": "~2.3",
+        "zendframework/zend-log": "~2.3",
+        "zendframework/zend-modulemanager": "~2.3",
+        "zendframework/zend-mvc": "~2.3",
+        "zendframework/zend-serializer": "~2.3",
+        "zendframework/zend-servicemanager": "~2.3",
+        "zendframework/zend-stdlib": "~2.3",
+        "zendframework/zend-view": "~2.3"
+    },
+    "autoload": {
+        "psr-0": {
+            "AutoDeploy": "src"
+        },
+        "classmap" : ["Module.php"]
+    }
+}
