@@ -15,8 +15,18 @@ cp vendor/totallydave/auto-deploy/config/module.config.php config/autoload/auto_
 
 Update the default configuration as you need (below is the minimum you'll need to get up and running)
 ```
-...
+ ...
 
+ 'application' => [
+   'email' => [
+     'allowedDevEmailDomains' => [
+       [YOUR EMAIL DOMAIN] // use regex pattern e.g. 'github\.com' for foo@github.com
+     ],
+   ]
+ ],
+  
+  ...
+         
  'auto_deploy' => [
       // This is the git branch that you wish to auto deploy
       'vcs' => [
@@ -29,5 +39,5 @@ Update the default configuration as you need (below is the minimum you'll need t
       ],
   ]
 
-...
+ ...
 ```
