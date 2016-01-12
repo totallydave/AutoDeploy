@@ -245,6 +245,8 @@ class SystemEmail implements SystemEmailInterface
                     $message->addTo($email);
                 }
             }
+        } else {
+            $message->addTo($email);
         }
     }
 }
