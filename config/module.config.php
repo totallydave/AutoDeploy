@@ -21,6 +21,7 @@
          'vcs' => [
              'type' => 'git',
              'branch' => 'master',
+             'originUrl' => ''
          ],
 
          // This is a list of white-listed IP addresses for the modules internal firewall

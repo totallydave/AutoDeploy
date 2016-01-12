@@ -66,17 +66,29 @@ class Git extends Vcs implements VcsInterface
      */
     protected function findProjectRoot()
     {
-        chdir(dirname(__DIR__));
-        $dir = realpath(dirname(__DIR__));
+        $config = $this->getConfig();
+        $dir = realpath(APPLICATION_ROOT);
+
         while ($dir) {
             $gitConfig = $dir . DIRECTORY_SEPARATOR
-                       . '.git' . DIRECTORY_SEPARATOR . 'config';
+                . '.git' . DIRECTORY_SEPARATOR . 'config';
+
             if (file_exists($gitConfig)) {
-                echo "found .git/config at $dir";
-                break;
+                exec('git config --get remote.origin.url', $url);
+
+                if (is_array($url)) {
+                    $url = current($url);
+                }
+
+                if ($url == $config['originUrl']) {
+                    echo "found .git/config at $dir";
+
+                    break;
+                }
             }
 
-            $dir = dirname($dir);
+            // lets move up a level
+            $dir = realpath($dir . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR);
         }
 
         return $dir;
