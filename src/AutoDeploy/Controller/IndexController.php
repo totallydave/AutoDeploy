@@ -51,9 +51,6 @@ class IndexController extends AbstractActionController
 
         try {
             $request = Json::decode($request);
-        } catch (RuntimeException $e) {
-            $this->log($e->getMessage(), $request, true);
-            exit;
         } catch (\Exception $e) {
             $this->log($e->getMessage(), $request, true);
             exit;
@@ -69,7 +66,7 @@ class IndexController extends AbstractActionController
         try {
             $vcs = VcsFactory::factory($autoDeployConfig['vcs']);
             $vcs->run();
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $this->log($e->getMessage(), $request, true);
             exit;
         }
