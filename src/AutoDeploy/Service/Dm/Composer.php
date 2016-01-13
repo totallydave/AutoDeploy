@@ -31,7 +31,12 @@ class Composer extends Service
         chdir($projectRoot);
 
         // update composer
-        system('composer update 2>&1', $composerUpdate);
+        ob_clean();
+        ob_start();
+
+        system('composer update 2>&1');
+
+        $composerUpdate = ob_get_clean();
 
         $log = "\nResult of composer update:\n";
         if (is_array($composerUpdate)) {
