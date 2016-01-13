@@ -30,19 +30,27 @@ class Composer extends Service
         // swap to project root
         chdir($projectRoot);
 
+        /**
+         * @todo investigate a way to do this without writing to the filesystem
+         */
+        $tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'composer_update_log';
+
+        if (file_exists($tmpFile)) {
+            unlink($tmpFile);
+        }
+
         // update composer
-        ob_clean();
-        ob_start();
+        exec("composer update 2>$tmpFile");
 
-        system('composer update 2>&1');
-
-        $composerUpdate = ob_get_clean();
+        if (file_exists($tmpFile)) {
+            $composerUpdate = file_get_contents($tmpFile);
+        }
 
         $log = "\nResult of composer update:\n";
         if (is_array($composerUpdate)) {
             $log .= implode("\n", $composerUpdate) . "\n";
         } elseif (is_string($composerUpdate)) {
-            $log .= implode("\n", $composerUpdate) . "\n";
+            $log .= $composerUpdate . "\n";
         }
 
         $this->log = $log;
