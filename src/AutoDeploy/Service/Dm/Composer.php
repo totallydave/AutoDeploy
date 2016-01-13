@@ -32,6 +32,7 @@ class Composer extends Service
 
         // get current branch
         exec("composer update", $composerUpdate);
+//        $composerUpdate = [];
 
         $log = "\nResult of composer update:\n"
             . implode("\n", $composerUpdate) . "\n";
@@ -61,7 +62,7 @@ class Composer extends Service
             if (file_exists($composerConfig)) {
                 $composerConfig = Json::decode(file_get_contents($composerConfig));
 
-                if (!empty($composerConfig['name']) && $composerConfig['name'] == $config['name']) {
+                if (!empty($composerConfig->name) && $composerConfig->name == $config['name']) {
                     echo "found composer.json at $dir";
 
                     break;

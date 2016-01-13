@@ -16,7 +16,8 @@ class ServiceManager implements ServiceManagerInterface
      * @var array
      */
     protected static $serviceNamespaces = [
-        'vcs' => 'AutoDeploy\Service\Vcs'
+        'vcs' => 'AutoDeploy\Service\Vcs',
+        'dm' => 'AutoDeploy\Service\Dm',
     ];
 
     /**
@@ -51,8 +52,15 @@ class ServiceManager implements ServiceManagerInterface
                 ));
             }
 
+            if (!is_callable(static::$serviceNamespaces[$serviceName] . '\ServiceFactory::factory')) {
+                throw new InvalidArgumentException(sprintf(
+                    "factory method not found in registered service class '%s'",
+                    static::$serviceNamespaces[$serviceName] . '\ServiceFactory'
+                ));
+            }
+
             $this->services[] = call_user_func_array(
-                static::$serviceNamespaces[$serviceName] . '\ServiceFactory', [$serviceConfig]
+                [static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'], [$serviceConfig]
             );
         }
     }
@@ -76,7 +84,10 @@ class ServiceManager implements ServiceManagerInterface
             $log = '';
 
             foreach ($this->services as $service) {
+                $log .= '------------------------ ' . $service->getType() . ' start';
                 $log .= $service->getLog();
+                $log .= '------------------------ ' . $service->getType() . ' end';
+                $log .= "\n";
             }
 
             $this->log = $log;
