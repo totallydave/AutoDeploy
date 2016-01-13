@@ -31,8 +31,7 @@ class Composer extends Service
         chdir($projectRoot);
 
         // get current branch
-        exec("composer update", $composerUpdate);
-//        $composerUpdate = [];
+        exec("composer update -v", $composerUpdate);
 
         $log = "\nResult of composer update:\n"
             . implode("\n", $composerUpdate) . "\n";
