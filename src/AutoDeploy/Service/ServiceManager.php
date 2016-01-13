@@ -24,6 +24,11 @@ class ServiceManager implements ServiceManagerInterface
      */
     protected $services = [];
 
+    /**
+     * @var string
+     */
+    protected $log;
+
     public function __construct(array $config = [])
     {
         if (!array_key_exists('services', $config)) {
@@ -52,8 +57,31 @@ class ServiceManager implements ServiceManagerInterface
         }
     }
 
+    /**
+     * @return void
+     */
     public function run()
     {
-        var_dump($this);die;
+        foreach ($this->services as $service) {
+            $service->run();
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getLog()
+    {
+        if ($this->log === null) {
+            $log = '';
+
+            foreach ($this->services as $service) {
+                $log .= $service->getLog();
+            }
+
+            $this->log = $log;
+        }
+
+        return $this->log;
     }
 }
