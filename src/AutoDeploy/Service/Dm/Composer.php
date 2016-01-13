@@ -30,11 +30,15 @@ class Composer extends Service
         // swap to project root
         chdir($projectRoot);
 
-        // get current branch
-        exec("composer update -v", $composerUpdate);
+        // update composer
+        system('composer update 2>&1', $composerUpdate);
 
-        $log = "\nResult of composer update:\n"
-            . implode("\n", $composerUpdate) . "\n";
+        $log = "\nResult of composer update:\n";
+        if (is_array($composerUpdate)) {
+            $log .= implode("\n", $composerUpdate) . "\n";
+        } elseif (is_string($composerUpdate)) {
+            $log .= implode("\n", $composerUpdate) . "\n";
+        }
 
         $this->log = $log;
     }
@@ -56,7 +60,7 @@ class Composer extends Service
 
         while ($dir) {
             $composerConfig = $dir . DIRECTORY_SEPARATOR
-                . 'composer.json';
+                            . 'composer.json';
 
             if (file_exists($composerConfig)) {
                 $composerConfig = Json::decode(file_get_contents($composerConfig));
