@@ -24,7 +24,7 @@ class ServiceManager implements ServiceManagerInterface
      */
     protected $services = [];
 
-    public function __contruct(array $config = [])
+    public function __construct(array $config = [])
     {
         if (!array_key_exists('services', $config)) {
             throw new InvalidArgumentException("'services' config not found");
@@ -47,7 +47,7 @@ class ServiceManager implements ServiceManagerInterface
             }
 
             $this->services[] = call_user_func_array(
-                static::$serviceNamespaces[$serviceName] . '\ServiceFactory', [$config]
+                static::$serviceNamespaces[$serviceName] . '\ServiceFactory', [$serviceConfig]
             );
         }
     }
