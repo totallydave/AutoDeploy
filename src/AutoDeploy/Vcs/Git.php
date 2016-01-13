@@ -8,7 +8,7 @@
  */
 namespace AutoDeploy\Vcs;
 
-use AutoDeploy\Vcs\Exception\InvalidArgumentException;
+use AutoDeploy\Exception\InvalidArgumentException;
 
 class Git extends Vcs implements VcsInterface
 {

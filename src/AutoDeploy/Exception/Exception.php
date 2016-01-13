@@ -6,11 +6,11 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Vcs\Exception;
+namespace AutoDeploy\Exception;
 
 /**
  * Exception for AutoDeploy\Application
  */
-interface ExceptionInterface
+class Exception extends \Exception implements ExceptionInterface
 {
 }

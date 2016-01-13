@@ -8,6 +8,8 @@
  */
 namespace AutoDeploy\Vcs;
 
+use AutoDeploy\Exception\InvalidArgumentException;
+
 class Vcs implements VcsInterface
 {
     /**
@@ -34,7 +36,7 @@ class Vcs implements VcsInterface
             $this->setType($vcs->getType());
             $this->setConfig($vcs->getConfig());
         } elseif ($vcs !== null) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Expecting an array or a Vcs object, received "%s"',
                 (is_object($vcs) ? get_class($vcs) : gettype($vcs))
             ));

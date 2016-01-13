@@ -6,7 +6,7 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Application\Exception;
+namespace AutoDeploy\Exception;
 
 /**
  * Exception for AutoDeploy\Application

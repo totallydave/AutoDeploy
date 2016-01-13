@@ -9,11 +9,9 @@
 namespace AutoDeploy\Controller;
 
 use AutoDeploy\Application\SystemEmailInterface;
-use AutoDeploy\Vcs\Exception\Exception;
+use AutoDeploy\Exception\InvalidArgumentException;
 use AutoDeploy\Vcs\VcsFactory;
-use Zend\Json\Exception\RuntimeException;
 use Zend\Json\Json;
-use Zend\Log\Exception\InvalidArgumentException;
 use Zend\Log\Logger;
 use Zend\Log\LoggerInterface;
 use Zend\Log\Writer\Stream;
@@ -30,7 +28,7 @@ class IndexController extends AbstractActionController
     /**
      * @return \Zend\Stdlib\ResponseInterface
      *
-     * @throws \AutoDeploy\Vcs\Exception\InvalidArgumentException
+     * @throws \AutoDeploy\Exception\InvalidArgumentException
      */
     public function indexAction()
     {

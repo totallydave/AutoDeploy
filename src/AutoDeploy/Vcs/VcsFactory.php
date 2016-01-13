@@ -8,6 +8,8 @@
  */
 namespace AutoDeploy\Vcs;
 
+use AutoDeploy\Exception\InvalidArgumentException;
+
 abstract class VcsFactory
 {
     /**
@@ -23,12 +25,12 @@ abstract class VcsFactory
      * @param $config
      * @param null $defaultType
      * @return Vcs
-     * @throws Exception\InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function factory($config, $defaultType = null)
     {
         if (!is_array($config)) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'Expecting an array, received "%s"',
                 (is_object($config) ? get_class($config) : gettype($config))
             ));
@@ -42,7 +44,7 @@ abstract class VcsFactory
         }
 
         if ($type && !isset(static::$typeClasses[$type])) {
-            throw new Exception\InvalidArgumentException(sprintf(
+            throw new InvalidArgumentException(sprintf(
                 'no class registered for type "%s"',
                 $type
             ));
@@ -52,7 +54,7 @@ abstract class VcsFactory
             $class = static::$typeClasses[$type];
             $vcs = new $class($vcs);
             if (!$vcs instanceof VcsInterface) {
-                throw new Exception\InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'class "%s" registered for type "%s" does not implement AutoDeploy\Vcs\VcsInterface',
                     $class,
                     $type
