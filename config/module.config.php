@@ -17,11 +17,12 @@
      ],
 
      'auto_deploy' => [
-         // This is the git branch that you wish to auto deploy
-         'vcs' => [
-             'type' => 'git',
-             'branch' => 'master',
-             'originUrl' => ''
+         'services' => [
+             'vcs' => [
+                 'type' => 'git',
+                 'branch' => 'master', // This is the git branch that you wish to auto deploy
+                 'originUrl' => ''
+             ],
          ],
 
          // This is a list of white-listed IP addresses for the modules internal firewall

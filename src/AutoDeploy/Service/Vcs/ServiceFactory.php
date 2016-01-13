@@ -6,19 +6,21 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Vcs;
+namespace AutoDeploy\Service\Vcs;
 
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Service\ServiceFactoryInterface;
+use AutoDeploy\Service\ServiceInterface;
 
-abstract class VcsFactory
+abstract class ServiceFactory implements ServiceFactoryInterface
 {
     /**
-     * Registered vcs-specific classes
+     * Registered service specific classes
      *
      * @var array
      */
     protected static $typeClasses = array(
-        'git'   => 'AutoDeploy\Vcs\Git',
+        'git'   => 'AutoDeploy\Service\Vcs\Git',
     );
 
     /**
@@ -36,9 +38,9 @@ abstract class VcsFactory
             ));
         }
 
-        $vcs = new Vcs($config);
+        $service = new Service($config);
 
-        $type = strtolower($vcs->getType());
+        $type = strtolower($service->getType());
         if (!$type && $defaultType) {
             $type = $defaultType;
         }
@@ -52,16 +54,16 @@ abstract class VcsFactory
 
         if ($type && isset(static::$typeClasses[$type])) {
             $class = static::$typeClasses[$type];
-            $vcs = new $class($vcs);
-            if (!$vcs instanceof VcsInterface) {
+            $service = new $class($service);
+            if (!$service instanceof ServiceInterface) {
                 throw new InvalidArgumentException(sprintf(
-                    'class "%s" registered for type "%s" does not implement AutoDeploy\Vcs\VcsInterface',
+                    'class "%s" registered for type "%s" does not implement AutoDeploy\Service\ServiceInterface',
                     $class,
                     $type
                 ));
             }
         }
 
-        return $vcs;
+        return $service;
     }
 }

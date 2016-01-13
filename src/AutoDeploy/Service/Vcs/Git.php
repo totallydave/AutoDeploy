@@ -6,11 +6,11 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Vcs;
+namespace AutoDeploy\Service\Vcs;
 
 use AutoDeploy\Exception\InvalidArgumentException;
 
-class Git extends Vcs implements VcsInterface
+class Git extends Service
 {
     /**
      * @return void
@@ -37,8 +37,8 @@ class Git extends Vcs implements VcsInterface
         // check current branch matches expected auto_deploy branch
         if ($currentBranch != $this->config['branch']) {
             $message = 'Current branch "' . $currentBranch . '" does not '
-                     . 'match excepted auto deploy branch "'
-                     . $this->config['branch'] . '"';
+                . 'match excepted auto deploy branch "'
+                . $this->config['branch'] . '"';
 
             throw new InvalidArgumentException($message);
         }
@@ -50,8 +50,8 @@ class Git extends Vcs implements VcsInterface
         exec("git pull", $gitPull);
 
         $log = "\nResult of git pull:\n"
-             . implode("\n", $gitReset) . "\n"
-             . implode("\n", $gitPull) . "\n";
+            . implode("\n", $gitReset) . "\n"
+            . implode("\n", $gitPull) . "\n";
 
         $this->log = $log;
     }

@@ -6,11 +6,12 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Vcs;
+namespace AutoDeploy\Service\Vcs;
 
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Service\ServiceInterface;
 
-class Vcs implements VcsInterface
+class Service implements ServiceInterface
 {
     /**
      * @var String
@@ -31,13 +32,13 @@ class Vcs implements VcsInterface
     {
         if (is_array($vcs)) {
             $this->parseConfig($vcs);
-        } elseif ($vcs instanceof VcsInterface) {
+        } elseif ($vcs instanceof ServiceInterface) {
             // Copy constructor
             $this->setType($vcs->getType());
             $this->setConfig($vcs->getConfig());
         } elseif ($vcs !== null) {
             throw new InvalidArgumentException(sprintf(
-                'Expecting an array or a Vcs object, received "%s"',
+                'Expecting an array or a Service object, received "%s"',
                 (is_object($vcs) ? get_class($vcs) : gettype($vcs))
             ));
         }

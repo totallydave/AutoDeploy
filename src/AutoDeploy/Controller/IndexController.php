@@ -10,6 +10,7 @@ namespace AutoDeploy\Controller;
 
 use AutoDeploy\Application\SystemEmailInterface;
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Service\ServiceManager;
 use AutoDeploy\Vcs\VcsFactory;
 use Zend\Json\Json;
 use Zend\Log\Logger;
@@ -24,6 +25,11 @@ class IndexController extends AbstractActionController
      * @var \Zend_Application
      */
     protected $application;
+
+    /**
+     * @var ServiceManager
+     */
+    protected $autoDeployServiceManager;
 
     /**
      * @return \Zend\Stdlib\ResponseInterface
@@ -62,8 +68,8 @@ class IndexController extends AbstractActionController
         }
 
         try {
-            $vcs = VcsFactory::factory($autoDeployConfig['vcs']);
-            $vcs->run();
+            $serviceManager = $this->getAutoDeployServiceManager();
+            $serviceManager->run();
         } catch (\Exception $e) {
             $this->log($e->getMessage(), $request, true);
             exit;
@@ -72,20 +78,20 @@ class IndexController extends AbstractActionController
         // create log message
         // we can assume that the config branch is correct at this point
         $log = "Branch: " . $autoDeployConfig['vcs']['branch'] . "\n"
-             . "Num Commits: " . count($request->commits) . "\n"
-             . "Commits:\n";
+            . "Num Commits: " . count($request->commits) . "\n"
+            . "Commits:\n";
 
         if (is_array($request->commits)) {
             foreach ($request->commits AS $commit) {
                 $log .= "\n" . $commit->timestamp
-                      . "\n" . $commit->id
-                      . "\n" . $commit->author->name . " - "
-                      . $commit->author->email . "\n"
-                      . rtrim($commit->message, "\n") . "\n";
+                    . "\n" . $commit->id
+                    . "\n" . $commit->author->name . " - "
+                    . $commit->author->email . "\n"
+                    . rtrim($commit->message, "\n") . "\n";
             }
         }
 
-        $log .= $vcs->getLog();
+        $log .= $serviceManager->getLog();
 
         $this->log($log);
         $this->mailLog($log, $request);
@@ -94,6 +100,19 @@ class IndexController extends AbstractActionController
         $response->setStatusCode(200);
         $response->setContent($log);
         return $response;
+    }
+
+    /**
+     * @return ServiceManager
+     */
+    protected function getAutoDeployServiceManager()
+    {
+        if ($this->autoDeployServiceManager === null) {
+            $application = $this->getApplication();
+            $this->autoDeployServiceManager = new ServiceManager($application->getConfig()['auto_deploy']);
+        }
+
+        return $this->autoDeployServiceManager;
     }
 
     /**

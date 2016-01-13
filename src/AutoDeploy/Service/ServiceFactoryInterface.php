@@ -6,12 +6,15 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Vcs;
+namespace AutoDeploy\Service;
 
-interface VcsInterface
+interface ServiceFactoryInterface
 {
     /**
+     * @param $config
+     * @param null $defaultType
      * @return mixed
+     * @throws InvalidArgumentException
      */
-    public function run();
+    public static function factory($config, $defaultType = null);
 }
