@@ -32,6 +32,12 @@ Update the default configuration as you need (below is the minimum you'll need t
          'vcs' => [
              'originUrl' => '[GIT REPOSITORY URL]' // This is the git branch that you wish to auto deploy
          ],
+
+         ...
+         
+         'dm' => [
+             'name' => '[COMPOSER PACKAGE NAME]' // This is required to identify the correct composer.json file
+         ],
      ],
 
       // This is a list of white-listed IP addresses for the modules internal firewall

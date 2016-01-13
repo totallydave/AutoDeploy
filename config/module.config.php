@@ -23,6 +23,11 @@
                  'branch' => 'master', // This is the git branch that you wish to auto deploy
                  'originUrl' => ''
              ],
+
+             'dm' => [
+                 'type' => 'composer',
+                 'name' => '' // This is required to identify the correct composer.json file
+            ],
          ],
 
          // This is a list of white-listed IP addresses for the modules internal firewall
