@@ -11,12 +11,39 @@ namespace AutoDeploy\Service;
 interface ServiceInterface
 {
     /**
-     * @return mixed
+     * @param array $config
      */
-    public function run();
+    public function parseConfig(array $config = []);
 
     /**
-     * @return mixed
+     * @return array
+     */
+    public function getConfig();
+
+    /**
+     * @param array $config
+     *
+     * @return array
+     */
+    public function setConfig(array $config = []);
+
+    /**
+     * @param $type
+     */
+    public function setType($type);
+
+    /**
+     * @return String
+     */
+    public function getType();
+
+    /**
+     * @return String
      */
     public function getLog();
+
+    /**
+     * @return void
+     */
+    public function run();
 }
