@@ -12,4 +12,62 @@ use AutoDeploy\Service\AbstractService;
 
 class Service extends AbstractService
 {
+    /**
+     * @var string
+     */
+    protected $preRunUniqueId;
+
+    /**
+     * @var string
+     */
+    protected $postRunUniqueId;
+
+    /**
+     * @param $service
+     */
+    public function __construct($service)
+    {
+        parent::_construct($service);
+
+        $this->setPreRunUniqueId($this->getUniqueId());
+    }
+
+    /**
+     * @param string $id
+     */
+    protected function setPreRunUniqueId($id = null)
+    {
+        $this->preRunUniqueId = $id;
+    }
+
+    /**
+     * @param string $id
+     */
+    protected function setPostRunUniqueId($id = null)
+    {
+        $this->postRunUniqueId = $id;
+    }
+
+    /**
+     * Intended to be overridden
+     *
+     * @return string
+     */
+    protected function getUniqueId() {}
+
+    /**
+     *
+     */
+    public function run()
+    {
+        $this->postRun();
+    }
+
+    /**
+     *
+     */
+    protected function postRun()
+    {
+        $this->setPostRunUniqueId($this->getUniqueId());
+    }
 }

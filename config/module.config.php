@@ -27,7 +27,12 @@
              'dm' => [
                  'type' => 'composer',
                  'name' => '' // This is required to identify the correct composer.json file
-            ],
+             ],
+
+             /*'db' => [
+                 'type' => 'mysql',
+                 'migrationDir' => '../sql_updates' // This is where the db migration files are kept
+             ],*/
          ],
 
          // This is a list of white-listed IP addresses for the modules internal firewall

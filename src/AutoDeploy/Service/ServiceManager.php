@@ -12,12 +12,17 @@ use AutoDeploy\Exception\InvalidArgumentException;
 
 class ServiceManager implements ServiceManagerInterface
 {
+    const SERVICE_TYPE_VCS = 'vcs';
+    const SERVICE_TYPE_DM = 'dm';
+    const SERVICE_TYPE_DB = 'db';
+
     /**
      * @var array
      */
     protected static $serviceNamespaces = [
-        'vcs' => 'AutoDeploy\Service\Vcs',
-        'dm' => 'AutoDeploy\Service\Dm',
+        self::SERVICE_TYPE_VCS => 'AutoDeploy\Service\Vcs',
+        self::SERVICE_TYPE_DM => 'AutoDeploy\Service\Dm',
+        self::SERVICE_TYPE_DB => 'AutoDeploy\Service\Db',
     ];
 
     /**
@@ -52,6 +57,11 @@ class ServiceManager implements ServiceManagerInterface
                 ));
             }
 
+            /**
+             *  does the factory method exist
+             *
+             * @todo potentially change to verify that the class is an instance of the ServiceFactoryInterface
+             */
             if (!is_callable(static::$serviceNamespaces[$serviceName] . '\ServiceFactory::factory')) {
                 throw new InvalidArgumentException(sprintf(
                     "factory method not found in registered service class '%s'",
@@ -59,10 +69,23 @@ class ServiceManager implements ServiceManagerInterface
                 ));
             }
 
-            $this->services[] = call_user_func_array(
-                [static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'], [$serviceConfig]
-            );
+            // we want to force the db service to be the last this updated
+            if ($serviceName === static::SERVICE_TYPE_DB) {
+                $databaseService = call_user_func_array(
+                    [static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'], [$serviceConfig]
+                );
+            } else {
+                $this->services[$serviceName] = call_user_func_array(
+                    [static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'], [$serviceConfig]
+                );
+            }
         }
+
+        // set the vcs service so we can use it later
+        $databaseService->setVcsService($this->services[static::SERVICE_TYPE_VCS]);
+
+        // add the database service to the end of the service queue
+        $this->services[] = $databaseService;
     }
 
     /**

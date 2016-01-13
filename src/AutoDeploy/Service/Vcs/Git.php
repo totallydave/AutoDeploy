@@ -54,6 +54,8 @@ class Git extends Service
             . implode("\n", $gitPull) . "\n";
 
         $this->log = $log;
+
+        parent::run();
     }
 
     /**
@@ -95,5 +97,26 @@ class Git extends Service
         }
 
         return $dir;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUniqueId()
+    {
+        // get project root
+        $projectRoot = $this->findProjectRoot();
+        if (!$projectRoot) {
+            $message = 'Could not determine project root directory';
+            throw new InvalidArgumentException($message);
+        }
+
+        // swap to project root
+        chdir($projectRoot);
+
+        // get commit hash
+        exec('git rev-parse HEAD', $commitId);
+
+        return $commitId;
     }
 }
