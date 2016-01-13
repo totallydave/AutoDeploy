@@ -47,7 +47,7 @@ class ServiceManager implements ServiceManagerInterface
             }
 
             $this->services[] = call_user_func_array(
-                static::$serviceNamespaces[$serviceName] . '\ServiceFactory', [$config]
+                static::$serviceNamespaces[$serviceName] . '\ServiceFactory', [$serviceConfig]
             );
         }
     }
