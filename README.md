@@ -34,7 +34,7 @@ Update the default configuration as you need (below is the minimum you'll need t
          ],
 
          ...
-         
+
          'dm' => [
              'name' => '[COMPOSER PACKAGE NAME]' // This is required to identify the correct composer.json file
          ],
@@ -47,4 +47,20 @@ Update the default configuration as you need (below is the minimum you'll need t
   ]
 
  ...
+```
+
+Add 'AutoDeploy' to your registered modules in application.config.php
+```
+return array(
+    'modules' => array(
+        // other modules
+        ...
+
+        'AutoDeploy'
+
+        ...
+    ),
+    // other content
+);
+
 ```
