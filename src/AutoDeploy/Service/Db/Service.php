@@ -48,7 +48,7 @@ class Service extends AbstractService
 
     /**
      * @return array
-     */
+     *
     protected function getMigrationFiles()
     {
         $config = $this->getConfig();
@@ -64,17 +64,9 @@ class Service extends AbstractService
     }
 
     /**
-     *
+     * @
      */
-    public function run()
-    {
-        $this->postRun();
-    }
-
-    /**
-     *
-     */
-    protected function postRun()
+    public function postRun()
     {
         $this->setPostRunUniqueId($this->getUniqueId());
     }

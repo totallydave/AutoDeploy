@@ -97,5 +97,23 @@ abstract class AbstractService implements ServiceInterface
     /**
      * @return void
      */
-    public function run() {}
+    public function run()
+    {
+        $this->execute();
+        $this->postRun();
+    }
+
+    /**
+     * This is intended to be overridden by service specific execute method
+     *
+     * @return void
+     */
+    public function execute() {}
+
+    /**
+     * This is intended to be overridden by service specific post run method
+     *
+     * @return void
+     */
+    public function postRun() {}
 }

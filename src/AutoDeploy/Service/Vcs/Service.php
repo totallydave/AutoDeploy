@@ -27,7 +27,7 @@ class Service extends AbstractService
      */
     public function __construct($service)
     {
-        parent::_construct($service);
+        parent::__construct($service);
 
         $this->setPreRunUniqueId($this->getUniqueId());
     }
@@ -56,17 +56,9 @@ class Service extends AbstractService
     protected function getUniqueId() {}
 
     /**
-     *
+     * @return void
      */
-    public function run()
-    {
-        $this->postRun();
-    }
-
-    /**
-     *
-     */
-    protected function postRun()
+    public function postRun()
     {
         $this->setPostRunUniqueId($this->getUniqueId());
     }

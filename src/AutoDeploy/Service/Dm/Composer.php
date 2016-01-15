@@ -18,7 +18,7 @@ class Composer extends Service
      *
      * @throws InvalidArgumentException
      */
-    public function run()
+    public function execute()
     {
         // get project root
         $projectRoot = $this->findProjectRoot();

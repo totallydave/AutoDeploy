@@ -17,7 +17,7 @@ class Git extends Service
      *
      * @throws InvalidArgumentException
      */
-    public function run()
+    public function execute()
     {
         // get project root
         $projectRoot = $this->findProjectRoot();
@@ -54,8 +54,6 @@ class Git extends Service
             . implode("\n", $gitPull) . "\n";
 
         $this->log = $log;
-
-        parent::run();
     }
 
     /**

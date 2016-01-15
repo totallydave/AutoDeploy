@@ -81,11 +81,14 @@ class ServiceManager implements ServiceManagerInterface
             }
         }
 
-        // set the vcs service so we can use it later
-        $databaseService->setVcsService($this->services[static::SERVICE_TYPE_VCS]);
+        // do we have a database service
+        if (isset($databaseService)) {
+            // set the vcs service so we can use it later
+            $databaseService->setVcsService($this->services[static::SERVICE_TYPE_VCS]);
 
-        // add the database service to the end of the service queue
-        $this->services[] = $databaseService;
+            // add the database service to the end of the service queue
+            $this->services[] = $databaseService;
+        }
     }
 
     /**

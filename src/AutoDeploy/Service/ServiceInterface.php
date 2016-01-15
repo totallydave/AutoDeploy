@@ -45,5 +45,15 @@ interface ServiceInterface
     /**
      * @return void
      */
+    public function execute();
+
+    /**
+     * @return void
+     */
     public function run();
+
+    /**
+     * @return void
+     */
+    public function postRun();
 }
