@@ -9,6 +9,7 @@
 namespace AutoDeploy\Service\Vcs;
 
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Exception\RuntimeException;
 
 class Git extends Service
 {
@@ -154,9 +155,40 @@ class Git extends Service
 
         $gitDiff = 'git diff --name-only ' . $this->preRunUniqueId . ' ' . $this->postRunUniqueId;
         // testing below
+        $gitDiff = 'git diff --name-only 3d96a3ebe5f77610c82ea9ec97cb41222212e9a0 25d84af2044c928450034226c47300e0fda96085';
 
         exec($gitDiff, $updatedFiles);
 
         return $updatedFiles;
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function executeRollback()
+    {
+        // get project root
+        $projectRoot = $this->findProjectRoot();
+        if (!$projectRoot) {
+            $message = 'Could not determine project root directory';
+            throw new InvalidArgumentException($message);
+        }
+
+        // swap to project root
+        chdir($projectRoot);
+
+        // do git reset
+        ob_clean();
+        ob_start();
+        system("git checkout " . $this->getPreRunUniqueId() . " 2>&1", $returnValue);
+        $gitRollback = ob_get_clean();
+
+        if (!empty($returnValue)) {
+            throw new RuntimeException(
+                "Issue rolling back git : " . $gitRollback
+            );
+        }
+
+        $this->setLog($this->getLog() . "\nGit Rollback: " . $gitRollback);
     }
 }

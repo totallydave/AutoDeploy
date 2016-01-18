@@ -45,6 +45,7 @@ class Mysql extends Service
 
         $sql .= "< [FILE] 2>&1";
 
+        $success = true;
         foreach ($this->updatedFiles as $file) {
             $log .= "Executing file '" . $file . "'\n";
 
@@ -57,6 +58,8 @@ class Mysql extends Service
 
             if (empty($return)) {
                 $result = 'Success';
+            } else {
+                $success = false;
             }
 
             $log .= "Result of mysql update: \n";
@@ -68,6 +71,10 @@ class Mysql extends Service
         }
 
         $this->setLog($log);
+
+        if (!$success) {
+            throw new RuntimeException("Mysql import was unsuccessful : " . $this->getLog());
+        }
     }
 
     /**
@@ -151,7 +158,17 @@ class Mysql extends Service
         $this->setLog($log);
 
         if (!$success) {
-            throw new RuntimeException("Mysql dump was unsuccessful");
+            throw new RuntimeException("Mysql dump was unsuccessful : " . $this->getLog());
         }
+    }
+
+    /**
+     * @return void
+     */
+    public function executeRollback()
+    {
+        throw new RuntimeException(
+            "Mysql rollback not written yet - Please do so manually"
+        );
     }
 }

@@ -9,6 +9,7 @@
 namespace AutoDeploy\Service\Dm;
 
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Exception\RuntimeException;
 use Zend\Json\Json;
 
 class Composer extends Service
@@ -81,5 +82,41 @@ class Composer extends Service
         }
 
         return $dir;
+    }
+
+    /**
+     * @throws RuntimeException
+     */
+    public function executeRollback()
+    {
+        // get project root
+        $projectRoot = $this->findProjectRoot();
+        if (!$projectRoot) {
+            $message = 'Could not determine project root directory';
+            throw new InvalidArgumentException($message);
+        }
+
+        if (!$this->getVcsService()->getHasRolledBack()) {
+            throw new RuntimeException(
+                "Rolling back composer depends on VCS having rolled back successfully"
+            );
+        }
+
+        // swap to project root
+        chdir($projectRoot);
+
+        // update composer
+        ob_clean();
+        ob_start();
+        system("composer update 2>&1", $returnValue);
+        $composerUpdate = ob_get_clean();
+
+        if (!empty($returnValue)) {
+            throw new RuntimeException(
+                "Issue rolling back composer : " . $composerUpdate
+            );
+        }
+
+        $this->setLog($this->getLog() . "\nComposer Rollback: " . $composerUpdate);
     }
 }

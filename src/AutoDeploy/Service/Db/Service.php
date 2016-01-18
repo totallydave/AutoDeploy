@@ -14,11 +14,6 @@ use AutoDeploy\Exception\InvalidArgumentException;
 class Service extends AbstractService implements DbServiceInterface
 {
     /**
-     * @var \AutoDeploy\Service\Vcs\Service
-     */
-    protected $vcsService;
-
-    /**
      * @var array
      */
     protected $updatedFiles = [];
@@ -76,30 +71,6 @@ class Service extends AbstractService implements DbServiceInterface
     }
 
     /**
-     * @param \AutoDeploy\Service\Vcs\Service $service
-     */
-    public function setVcsService(\AutoDeploy\Service\Vcs\Service $service)
-    {
-        $this->vcsService = $service;
-    }
-
-    /**
-     * @return \AutoDeploy\Service\Vcs\Service $service
-     */
-    public function getVcsService()
-    {
-        return $this->vcsService;
-    }
-
-    /**
-     * @return boolean
-     */
-    protected function hasVcsUpdated()
-    {
-        return $this->getVcsService()->hasUpdated();
-    }
-
-        /**
      * @return boolean
      */
     protected function isDbServiceUpdateRequired()
@@ -127,13 +98,13 @@ class Service extends AbstractService implements DbServiceInterface
         $log = $this->getLog() . "\n";
 
         // is there a vcs change?
-        if (!$this->hasVcsUpdated()) {
+        /*if (!$this->hasVcsUpdated()) {
             $log .= $this->getVcsService()->getType() . ' has not been updated so no new db migration files';
 
             $this->setLog($log);
             // nothing to do here
             return;
-        }
+        }*/
 
         if (!$this->isDbServiceUpdateRequired()) {
             $log .= sprintf(
@@ -146,8 +117,22 @@ class Service extends AbstractService implements DbServiceInterface
             return;
         }
 
-        $this->executeBackup();
-        $this->executeMigration();
+        try {
+            $this->executeBackup();
+            $this->executeMigration();
+        } catch (\Exception $e) {
+            $log .= "\n---------------ERROR---------------\n"
+                  . $e->getMessage() . "\n";
+
+            $this->setLog($log);
+
+            // this will get caught in the controller if exception is thrown
+            $this->getServiceManager()->rollBack();
+
+            throw $e;
+        }
+
+        $this->setLog($log);
     }
 
     /**

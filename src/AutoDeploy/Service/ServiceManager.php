@@ -83,12 +83,34 @@ class ServiceManager implements ServiceManagerInterface
 
         // do we have a database service
         if (isset($databaseService)) {
-            // set the vcs service so we can use it later
-            $databaseService->setVcsService($this->services[static::SERVICE_TYPE_VCS]);
-
             // add the database service to the end of the service queue
             $this->services[] = $databaseService;
         }
+
+        // set the vcs service so we can use it later
+        foreach ($this->services as $serviceName => $service) {
+            $service->setServiceManager($this);
+
+            if ($serviceName === static::SERVICE_TYPE_VCS) {
+                continue;
+            }
+
+            $service->setVcsService($this->services[static::SERVICE_TYPE_VCS]);
+        }
+    }
+
+    /**
+     * @param string $serviceName
+     *
+     * @return ServiceInterface
+     */
+    public function getService($serviceName = null)
+    {
+        if (!array_key_exists($serviceName, $this->services)) {
+            return null;
+        }
+
+        return $this->services[$serviceName];
     }
 
     /**
@@ -102,6 +124,16 @@ class ServiceManager implements ServiceManagerInterface
     }
 
     /**
+     * @return void
+     */
+    public function rollBack()
+    {
+        foreach ($this->services as $service) {
+            $service->rollBack();
+        }
+    }
+
+    /**
      * @return string
      */
     public function getLog()
@@ -109,11 +141,35 @@ class ServiceManager implements ServiceManagerInterface
         if ($this->log === null) {
             $log = '';
 
+            $summary = [
+                'successful' => [],
+                'failed' => [],
+                'rolledBack' => [],
+            ];
+
             foreach ($this->services as $service) {
                 $log .= '------------------------ ' . $service->getType() . ' start';
                 $log .= $service->getLog();
                 $log .= '------------------------ ' . $service->getType() . ' end';
                 $log .= "\n";
+
+                if ($service->getHasRun()) {
+                    $summary['successful'][] = $service->getType();
+                } else {
+                    $summary['failed'][] = $service->getType();
+                }
+
+                if ($service->getHasRolledBack()) {
+                    $summary['rolledBack'][] = $service->getType();
+                }
+            }
+
+            $log .= "------------------------ AutoDeploy summary\n"
+                  . "Successful services: \n" . implode("\n", $summary['successful']) . "\n"
+                  . "\nFailed services: \n" . implode("\n", $summary['failed']) . "\n";
+
+            if (count($summary['failed'])) {
+                $log .= "\nRolled Back services: \n" . implode("\n", $summary['rolledBack']);
             }
 
             $this->log = $log;

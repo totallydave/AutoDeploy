@@ -68,4 +68,9 @@ interface ServiceInterface
      * @return void
      */
     public function setHasRun($boolean = false);
+
+    /**
+     * @return void
+     */
+    public function rollBack();
 }

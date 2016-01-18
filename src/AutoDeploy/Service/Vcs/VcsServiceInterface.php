@@ -34,4 +34,9 @@ interface VcsServiceInterface
      * @return string
      */
     public function getPostRunUniqueId();
+
+    /**
+     * @return bool
+     */
+    public function getHasRolledBack();
 }

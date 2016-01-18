@@ -46,12 +46,12 @@
                      'database' => ''
                  ],
                  // the below is required to perform db migrations - multiple databases can be backed up if required
-                 'backup_connections' => [[
+                 'backup_connections' => [/*[
                      'hostname' => '',
                      'username' => '',
                      'password' => '',
                      'database' => ''
-                 ]],
+                 ]*/],
              ],
          ],
 

@@ -46,6 +46,7 @@ class IndexController extends AbstractActionController
         if (!$request) {
             $message = 'No request found';
             $this->log($message, $request, true);
+            $this->mailLog($message, $request);
             exit;
         }
 
@@ -56,7 +57,9 @@ class IndexController extends AbstractActionController
         try {
             $request = Json::decode($request);
         } catch (\Exception $e) {
-            $this->log($e->getMessage(), $request, true);
+            $log = $e->getMessage();
+            $this->log($log, $request, true);
+            $this->mailLog($log, $request);
             exit;
         }
 
@@ -64,6 +67,7 @@ class IndexController extends AbstractActionController
         if (!$autoDeployConfig) {
             $message = 'No \'auto_deploy\' config found';
             $this->log($message, $request, true);
+            $this->mailLog($message, $request);
             exit;
         }
 
@@ -71,23 +75,25 @@ class IndexController extends AbstractActionController
             $serviceManager = $this->getAutoDeployServiceManager();
             $serviceManager->run();
         } catch (\Exception $e) {
-            $this->log($e->getMessage(), $request, true);
+            $log = $e->getMessage() . $serviceManager->getLog();
+            $this->log($log, $request, true);
+            $this->mailLog($log, $request);
             exit;
         }
 
         // create log message
         // we can assume that the config branch is correct at this point
-        $log = "Branch: " . $autoDeployConfig['vcs']['branch'] . "\n"
+        $log = "Branch: " . $autoDeployConfig['services']['vcs']['branch'] . "\n"
              . "Num Commits: " . count($request->commits) . "\n"
              . "Commits:\n";
 
         if (is_array($request->commits)) {
             foreach ($request->commits AS $commit) {
                 $log .= "\n" . $commit->timestamp
-                    . "\n" . $commit->id
-                    . "\n" . $commit->author->name . " - "
-                    . $commit->author->email . "\n"
-                    . rtrim($commit->message, "\n") . "\n";
+                      . "\n" . $commit->id
+                      . "\n" . $commit->author->name . " - "
+                      . $commit->author->email . "\n"
+                      . rtrim($commit->message, "\n") . "\n";
             }
         }
 

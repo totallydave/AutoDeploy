@@ -13,9 +13,24 @@ use AutoDeploy\Exception\InvalidArgumentException;
 abstract class AbstractService implements ServiceInterface
 {
     /**
+     * @var \AutoDeploy\Service\Vcs\Service
+     */
+    protected $vcsService;
+
+    /**
+     * @var ServiceManager
+     */
+    protected $serviceManager;
+
+    /**
      * @var bool
      */
     protected $hasRun = false;
+
+    /**
+     * @var bool
+     */
+    protected $hasRolledBack = false;
 
     /**
      * @var String
@@ -124,6 +139,23 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
+     * @return bool
+     */
+    public function getHasRolledBack()
+    {
+        return $this->hasRolledBack;
+    }
+
+    /**
+     * @param bool $boolean
+     */
+    public function setHasRolledBack($boolean = false)
+    {
+        $this->hasRolledBack = $boolean;
+    }
+
+
+    /**
      * @return void
      */
     public function run()
@@ -131,6 +163,46 @@ abstract class AbstractService implements ServiceInterface
         $this->execute();
         $this->postRun();
         $this->setHasRun(true);
+    }
+
+    /**
+     * @param \AutoDeploy\Service\Vcs\Service $service
+     */
+    public function setVcsService(\AutoDeploy\Service\Vcs\Service $service)
+    {
+        $this->vcsService = $service;
+    }
+
+    /**
+     * @param ServiceManager $serviceManager
+     */
+    public function setServiceManager(ServiceManager $serviceManager)
+    {
+        $this->serviceManager = $serviceManager;
+    }
+
+    /**
+     * @return ServiceManager
+     */
+    public function getServiceManager()
+    {
+        return $this->serviceManager;
+    }
+
+    /**
+     * @return \AutoDeploy\Service\Vcs\Service $service
+     */
+    public function getVcsService()
+    {
+        return $this->getServiceManager()->getService(ServiceManager::SERVICE_TYPE_VCS);
+    }
+
+    /**
+     * @return boolean
+     */
+    protected function hasVcsUpdated()
+    {
+        return $this->getVcsService()->hasUpdated();
     }
 
     /**
@@ -146,4 +218,25 @@ abstract class AbstractService implements ServiceInterface
      * @return void
      */
     public function postRun() {}
+
+    /**
+     * This is intended to be overridden by service specific rollback method
+     *
+     * @return void
+     */
+    public function executeRollback() {}
+
+    /**
+     * @return void
+     */
+    public function rollBack()
+    {
+        if (!$this->getHasRun()) {
+            return;
+        }
+
+        $this->setLog($this->getLog() . '<<<<<<<< ROLL BACK');
+        $this->executeRollback();
+        $this->setHasRolledBack(true);
+    }
 }

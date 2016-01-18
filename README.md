@@ -98,6 +98,10 @@ return array(
 
 ```
 
+# Prerequisites
+- composer must be available globally by using command 'composer' to user composer service
+- mysql-server cli must be installed to use mysql db service
+- git must be installed to user git vcs service
 
 # GOTCHAS
 - auto_deploy.ipAddress : IP of VCS server must be added in config [GIT SERVER PROVIDER IP]
@@ -106,3 +110,9 @@ return array(
 - auto_deploy.services.db : exclude backupDir from vcs
 - auto_deploy.services.db : migration depends on vcs
 - auto_deploy.services.db : migration files must start with '_auto_deploy_'
+
+# @todo
+- add rollback for other failures
+- write rollback for db
+- allow multiple services within each type
+- write unit tests
