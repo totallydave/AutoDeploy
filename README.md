@@ -98,6 +98,8 @@ return array(
 
 ```
 
+Configure web hook in your chosen vcs provider to call [YOUR APPLICATION URL]/auto_deploy/ on push event
+
 # Prerequisites
 - composer must be available globally by using command 'composer' to user composer service
 - mysql-server must be installed to use mysql db service
