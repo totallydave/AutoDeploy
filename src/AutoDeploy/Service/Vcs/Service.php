@@ -49,6 +49,22 @@ class Service extends AbstractService implements VcsServiceInterface
     }
 
     /**
+     * @return string
+     */
+    public function getPreRunUniqueId()
+    {
+        return $this->preRunUniqueId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPostRunUniqueId()
+    {
+        return $this->postRunUniqueId;
+    }
+
+    /**
      * Intended to be overridden
      *
      * @return string

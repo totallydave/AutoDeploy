@@ -34,13 +34,24 @@
 
              'db' => [
                  'type' => 'mysql',
-                 'migrationDir' => 'sql_updates', // This is where the db migration files are kept relative to the vcs root
+                 'migrationDir' => '', // This is where the db migration files are kept relative to the vcs root
+                 // This is where the backup taken prior to a db migration are kept relative to the vcs root
+                 // make sure this directory is excluded from version control
+                 'backupDir' => '',
+                 // the below is required to perform db migrations - this is the target db
                  'connection' => [
                      'hostname' => '',
                      'username' => '',
                      'password' => '',
-                     'database' => '',
-                 ]
+                     'database' => ''
+                 ],
+                 // the below is required to perform db migrations - multiple databases can be backed up if required
+                 'backup_connections' => [[
+                     'hostname' => '',
+                     'username' => '',
+                     'password' => '',
+                     'database' => ''
+                 ]],
              ],
          ],
 

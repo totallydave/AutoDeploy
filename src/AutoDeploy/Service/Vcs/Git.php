@@ -152,11 +152,8 @@ class Git extends Service
         // swap to project root
         chdir($projectRoot);
 
-        echo 'git diff --name-only ' . $this->preRunUniqueId . ' ' . $this->postRunUniqueId;
-
         $gitDiff = 'git diff --name-only ' . $this->preRunUniqueId . ' ' . $this->postRunUniqueId;
         // testing below
-        $gitDiff = 'git diff --name-only 88879faff05d1134550bd8d1d166c3fc67c0b302 16b724db40a1d746bf0f163318a938b6b747ac51';
 
         exec($gitDiff, $updatedFiles);
 

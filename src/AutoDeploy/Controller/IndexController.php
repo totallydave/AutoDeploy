@@ -78,8 +78,8 @@ class IndexController extends AbstractActionController
         // create log message
         // we can assume that the config branch is correct at this point
         $log = "Branch: " . $autoDeployConfig['vcs']['branch'] . "\n"
-            . "Num Commits: " . count($request->commits) . "\n"
-            . "Commits:\n";
+             . "Num Commits: " . count($request->commits) . "\n"
+             . "Commits:\n";
 
         if (is_array($request->commits)) {
             foreach ($request->commits AS $commit) {
@@ -167,7 +167,6 @@ class IndexController extends AbstractActionController
      *
      * @param string $message
      * @param \stdClass $request
-     * @param boolean $error
      * @return void
      *
      * @throws InvalidArgumentException

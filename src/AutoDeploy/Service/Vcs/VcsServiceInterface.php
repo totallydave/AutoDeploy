@@ -24,4 +24,14 @@ interface VcsServiceInterface
      * @return string
      */
     public function findProjectRoot();
+
+    /**
+     * @return string
+     */
+    public function getPreRunUniqueId();
+
+    /**
+     * @return string
+     */
+    public function getPostRunUniqueId();
 }

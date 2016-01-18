@@ -6,17 +6,8 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Service\Db;
+namespace AutoDeploy\Exception;
 
-interface DbServiceInterface
+class RuntimeException extends \RuntimeException implements ExceptionInterface
 {
-    /**
-     * @return void
-     */
-    public function executeMigration();
-
-    /**
-     * @return void
-     */
-    public function executeBackup();
 }

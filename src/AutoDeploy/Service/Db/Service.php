@@ -63,7 +63,9 @@ class Service extends AbstractService implements DbServiceInterface
 
         $dirFiles = [];
         foreach ($files as $file) {
-            if ($file === '.' || $file === '..') {
+            if ($file === '.' || $file === '..' ||
+                // we only want the files with the correct naming convention
+                !preg_match("/^_auto_deploy_/", $file)) {
                 continue;
             }
 
@@ -122,16 +124,16 @@ class Service extends AbstractService implements DbServiceInterface
      */
     public function execute()
     {
-        $log = '';
+        $log = $this->getLog() . "\n";
 
         // is there a vcs change?
-        /*if (!$this->hasVcsUpdated()) {
+        if (!$this->hasVcsUpdated()) {
             $log .= $this->getVcsService()->getType() . ' has not been updated so no new db migration files';
 
             $this->setLog($log);
             // nothing to do here
             return;
-        }*/
+        }
 
         if (!$this->isDbServiceUpdateRequired()) {
             $log .= sprintf(
@@ -144,6 +146,7 @@ class Service extends AbstractService implements DbServiceInterface
             return;
         }
 
+        $this->executeBackup();
         $this->executeMigration();
     }
 
@@ -151,4 +154,9 @@ class Service extends AbstractService implements DbServiceInterface
      * @return void
      */
     public function executeMigration() {}
+
+    /**
+     * @return void
+     */
+    public function executeBackup() {}
 }
