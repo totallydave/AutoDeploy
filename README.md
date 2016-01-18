@@ -100,7 +100,7 @@ return array(
 
 # Prerequisites
 - composer must be available globally by using command 'composer' to user composer service
-- mysql-server cli must be installed to use mysql db service
+- mysql-server must be installed to use mysql db service
 - git must be installed to user git vcs service
 
 # GOTCHAS
