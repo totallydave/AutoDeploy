@@ -44,14 +44,29 @@ class Git extends Service
         }
 
         // do git reset
-        exec("git reset --hard", $gitReset);
+        ob_clean();
+        ob_start();
+        system("git reset --hard 2>&1");
+        $gitReset = ob_get_clean();
 
         // do git pull
-        exec("git pull", $gitPull);
+        ob_clean();
+        ob_start();
+        system("git pull 2>&1");
+        $gitPull = ob_get_clean();
 
-        $log = "\nResult of git pull:\n"
-            . implode("\n", $gitReset) . "\n"
-            . implode("\n", $gitPull) . "\n";
+        if (is_array($gitReset)) {
+            $gitReset = implode("\n", $gitReset);
+        }
+
+        if (is_array($gitPull)) {
+            $gitPull = implode("\n", $gitPull);
+        }
+
+        $log = "\nResult of git reset:\n"
+            . $gitReset . "\n"
+            . "\nResult of git pull:\n"
+            . $gitPull . "\n";
 
         $this->log = $log;
     }
@@ -64,7 +79,7 @@ class Git extends Service
      *
      * @return string
      */
-    protected function findProjectRoot()
+    public function findProjectRoot()
     {
         $config = $this->getConfig();
 
@@ -115,6 +130,36 @@ class Git extends Service
         // get commit hash
         exec('git rev-parse HEAD', $commitId);
 
+        if (is_array($commitId)) {
+            $commitId = current($commitId);
+        }
+
         return $commitId;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUpdatedFiles()
+    {
+        // get project root
+        $projectRoot = $this->findProjectRoot();
+        if (!$projectRoot) {
+            $message = 'Could not determine project root directory';
+            throw new InvalidArgumentException($message);
+        }
+
+        // swap to project root
+        chdir($projectRoot);
+
+        echo 'git diff --name-only ' . $this->preRunUniqueId . ' ' . $this->postRunUniqueId;
+
+        $gitDiff = 'git diff --name-only ' . $this->preRunUniqueId . ' ' . $this->postRunUniqueId;
+        // testing below
+        $gitDiff = 'git diff --name-only 88879faff05d1134550bd8d1d166c3fc67c0b302 16b724db40a1d746bf0f163318a938b6b747ac51';
+
+        exec($gitDiff, $updatedFiles);
+
+        return $updatedFiles;
     }
 }

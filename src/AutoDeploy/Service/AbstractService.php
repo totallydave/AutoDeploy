@@ -13,6 +13,11 @@ use AutoDeploy\Exception\InvalidArgumentException;
 abstract class AbstractService implements ServiceInterface
 {
     /**
+     * @var bool
+     */
+    protected $hasRun = false;
+
+    /**
      * @var String
      */
     protected $log;
@@ -87,11 +92,35 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
+     * @param string $log
+     */
+    public function setLog($log = '')
+    {
+        $this->log = $log;
+    }
+
+    /**
      * @return String
      */
     public function getLog()
     {
         return $this->log;
+    }
+
+    /**
+     * @param boolean $boolean
+     */
+    public function setHasRun($boolean = false)
+    {
+        $this->hasRun = $boolean;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getHasRun()
+    {
+        return $this->hasRun;
     }
 
     /**
@@ -101,6 +130,7 @@ abstract class AbstractService implements ServiceInterface
     {
         $this->execute();
         $this->postRun();
+        $this->setHasRun(true);
     }
 
     /**

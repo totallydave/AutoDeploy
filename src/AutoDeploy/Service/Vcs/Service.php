@@ -10,7 +10,7 @@ namespace AutoDeploy\Service\Vcs;
 
 use AutoDeploy\Service\AbstractService;
 
-class Service extends AbstractService
+class Service extends AbstractService implements VcsServiceInterface
 {
     /**
      * @var string
@@ -61,5 +61,33 @@ class Service extends AbstractService
     public function postRun()
     {
         $this->setPostRunUniqueId($this->getUniqueId());
+    }
+
+    /**
+     * @return boolean
+     */
+    public function hasUpdated()
+    {
+        if (!$this->getHasRun()) {
+            return false;
+        }
+
+        return $this->preRunUniqueId !== $this->postRunUniqueId;
+    }
+
+    /**
+     * @return array
+     */
+    public function getUpdatedFiles()
+    {
+        return [];
+    }
+
+    /**
+     * @return string
+     */
+    public function findProjectRoot()
+    {
+        return APPLICATION_ROOT;
     }
 }

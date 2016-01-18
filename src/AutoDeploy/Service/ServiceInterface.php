@@ -38,6 +38,11 @@ interface ServiceInterface
     public function getType();
 
     /**
+     * @param string
+     */
+    public function setLog($log = '');
+
+    /**
      * @return String
      */
     public function getLog();
@@ -56,4 +61,11 @@ interface ServiceInterface
      * @return void
      */
     public function postRun();
+
+    /**
+     * @param boolean $boolean
+     *
+     * @return void
+     */
+    public function setHasRun($boolean = false);
 }

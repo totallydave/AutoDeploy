@@ -17,6 +17,9 @@
      ],
 
      'auto_deploy' => [
+         /**
+          * @todo allow for multiple of each service type
+          */
          'services' => [
              'vcs' => [
                  'type' => 'git',
@@ -29,10 +32,16 @@
                  'name' => '' // This is required to identify the correct composer.json file
              ],
 
-             /*'db' => [
+             'db' => [
                  'type' => 'mysql',
-                 'migrationDir' => '../sql_updates' // This is where the db migration files are kept
-             ],*/
+                 'migrationDir' => 'sql_updates', // This is where the db migration files are kept relative to the vcs root
+                 'connection' => [
+                     'hostname' => '',
+                     'username' => '',
+                     'password' => '',
+                     'database' => '',
+                 ]
+             ],
          ],
 
          // This is a list of white-listed IP addresses for the modules internal firewall
