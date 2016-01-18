@@ -70,7 +70,42 @@ interface ServiceInterface
     public function setHasRun($boolean = false);
 
     /**
+     * @return bool
+     */
+    public function getHasRun();
+
+    /**
+     * @return bool
+     */
+    public function getHasRolledBack();
+
+    /**
+     * @param bool $boolean
+     */
+    public function setHasRolledBack($boolean = false);
+
+    /**
      * @return void
      */
     public function rollBack();
+
+    /**
+     * @param \AutoDeploy\Service\Vcs\Service $service
+     */
+    public function setVcsService(\AutoDeploy\Service\Vcs\Service $service);
+
+    /**
+     * @param ServiceManager $serviceManager
+     */
+    public function setServiceManager(ServiceManager $serviceManager);
+
+    /**
+     * @return ServiceManager
+     */
+    public function getServiceManager();
+
+    /**
+     * @return \AutoDeploy\Service\Vcs\Service $service
+     */
+    public function getVcsService();
 }

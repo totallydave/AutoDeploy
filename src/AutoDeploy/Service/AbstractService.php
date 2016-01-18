@@ -154,7 +154,6 @@ abstract class AbstractService implements ServiceInterface
         $this->hasRolledBack = $boolean;
     }
 
-
     /**
      * @return void
      */
