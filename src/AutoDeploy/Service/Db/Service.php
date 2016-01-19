@@ -98,13 +98,13 @@ class Service extends AbstractService implements DbServiceInterface
         $log = $this->getLog() . "\n";
 
         // is there a vcs change?
-        /*if (!$this->hasVcsUpdated()) {
+        if (!$this->hasVcsUpdated()) {
             $log .= $this->getVcsService()->getType() . ' has not been updated so no new db migration files';
 
             $this->setLog($log);
             // nothing to do here
             return;
-        }*/
+        }
 
         if (!$this->isDbServiceUpdateRequired()) {
             $log .= sprintf(
@@ -131,8 +131,6 @@ class Service extends AbstractService implements DbServiceInterface
 
             throw $e;
         }
-
-        $this->setLog($log);
     }
 
     /**
