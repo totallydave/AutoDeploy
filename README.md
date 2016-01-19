@@ -1,6 +1,19 @@
 # What is AutoDeploy?
 AutoDeploy is a *Zend Framework 2*-Module which provides a service to auto deploy code utilising web hooks from VCS providers.
 
+##Available services
+- Vcs (Git)
+- Dm - Dependency Manager (Composer)
+- Db - Database Migrations (Executing MySql migration file/s)
+
+###Notes 
+- Dm and Db services depend on a Vcs service
+- Db service will be run last
+- Db migration files must begin with '\_auto_deploy\_' this allows them to be ommitted from auto deployment
+- An error on the Db service will roll the other services back so it's important Vcs is run first (@todo force this)
+- An email log will be sent to any commiters in the update
+- If logging is enables a log will be written to the file system
+
 ## Installation
 
 Add the below to your index.php or web root php file
