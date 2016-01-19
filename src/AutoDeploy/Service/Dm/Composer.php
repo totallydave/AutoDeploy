@@ -34,7 +34,7 @@ class Composer extends Service
         // update composer
         ob_clean();
         ob_start();
-        system("composer update 2>&1");
+        system("composer update --no-dev 2>&1");
         $composerUpdate = ob_get_clean();
 
         $log = "\nResult of composer update:\n";
@@ -108,7 +108,7 @@ class Composer extends Service
         // update composer
         ob_clean();
         ob_start();
-        system("composer update 2>&1", $returnValue);
+        system("composer update --no-dev 2>&1", $returnValue);
         $composerUpdate = ob_get_clean();
 
         if (!empty($returnValue)) {
