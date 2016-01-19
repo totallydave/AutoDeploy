@@ -155,7 +155,6 @@ class Git extends Service
 
         $gitDiff = 'git diff --name-only ' . $this->preRunUniqueId . ' ' . $this->postRunUniqueId;
         // testing below
-        $gitDiff = 'git diff --name-only 3d96a3ebe5f77610c82ea9ec97cb41222212e9a0 25d84af2044c928450034226c47300e0fda96085';
 
         exec($gitDiff, $updatedFiles);
 
