@@ -111,7 +111,7 @@ Configure web hook in your chosen vcs provider to call [YOUR APPLICATION URL]/au
 - application.email.allowedDevEmailDomains : this relies on php environment variable 'env'
 - auto_deploy.services.db : exclude backupDir from vcs
 - auto_deploy.services.db : migration depends on vcs
-- auto_deploy.services.db : migration files must start with '_auto_deploy_'
+- auto_deploy.services.db : migration files must start with '\_auto_deploy\_'
 
 # @todo
 - add rollback for other failures
