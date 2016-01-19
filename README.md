@@ -1,7 +1,7 @@
 # What is AutoDeploy?
 AutoDeploy is a *Zend Framework 2*-Module which provides a service to auto deploy code utilising web hooks from VCS providers.
 
-# Installation
+## Installation
 
 Add the below to your index.php or web root php file
 ```
@@ -100,12 +100,12 @@ return array(
 
 Configure web hook in your chosen vcs provider to call [YOUR APPLICATION URL]/auto_deploy/ on push event
 
-# Prerequisites
+## Prerequisites
 - composer must be available globally by using command 'composer' to user composer service
 - mysql-server must be installed to use mysql db service
 - git must be installed to user git vcs service
 
-# GOTCHAS
+## GOTCHAS
 - auto_deploy.ipAddress : IP of VCS server must be added in config [GIT SERVER PROVIDER IP]
 - application.email : correctly configure this or you might find the emails end up in your spam
 - application.email.allowedDevEmailDomains : this relies on php environment variable 'env'
@@ -113,7 +113,7 @@ Configure web hook in your chosen vcs provider to call [YOUR APPLICATION URL]/au
 - auto_deploy.services.db : migration depends on vcs
 - auto_deploy.services.db : migration files must start with '\_auto_deploy\_'
 
-# @todo
+## @todo
 - add rollback for other failures
 - write rollback for db
 - allow multiple services within each type
