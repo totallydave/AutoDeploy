@@ -16,6 +16,10 @@ AutoDeploy is a *Zend Framework 2*-Module which provides a service to auto deplo
 
 ## Installation
 
+```
+composer require totallydave/auto-deploy
+```
+
 Add the below to your index.php or web root php file
 ```
 define('APPLICATION_ROOT', realpath(dirname(__DIR__)));
