@@ -21,6 +21,11 @@
         "zendframework/zendframework": ">=2.3"
     },
     "autoload": {
-        "psr-0": { "AutoDeploy\\": "src/" }
+        "psr-0": {
+            "AutoDeploy\\": "src/"
+        },
+        "classmap": [
+            "./Module.php"
+        ]
     }
 }
