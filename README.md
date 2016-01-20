@@ -129,6 +129,7 @@ Configure web hook in your chosen vcs provider to call [YOUR APPLICATION URL]/au
 - auto_deploy.services.db : exclude backupDir from vcs
 - auto_deploy.services.db : migration depends on vcs
 - auto_deploy.services.db : migration files must start with '\_auto_deploy\_'
+- auto_deploy.services.db : sql update files should contain the database that is being updated
 
 ## @todo
 - add rollback for other failures
