@@ -17,7 +17,7 @@
         "issues": "https://github.com/totallydave/auto-deploy/issues"
     },
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=5.3",
         "zendframework/zend-mail": ">=2.3",
         "zendframework/zend-mime": ">=2.3",
         "zendframework/zend-log": ">= 2.3",
