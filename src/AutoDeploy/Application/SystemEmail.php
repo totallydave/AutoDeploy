@@ -26,12 +26,12 @@ class SystemEmail implements SystemEmailInterface
     public $bccEmail;
     public $replyTo;
 
-    protected $allowedDevEmailDomains = [];
+    protected $allowedDevEmailDomains = array();
 
     var $patterns = array();
     var $replacements = array();
 
-    public function __construct(array $emailConfig = [])
+    public function __construct(array $emailConfig = array())
     {
         foreach ($emailConfig as $field => $value) {
             $this->{$field} = $value;

@@ -70,29 +70,4 @@
              'mailerClass' => 'AutoDeploy\Application\SystemEmail', // default use the Zend Logger (must be implement AutoDeploy\Application\SystemEmailInterface)
          )
      ),
-
-     'controllers' => array(
-         'invokables' => array(
-             'AutoDeploy\Controller\Index' => 'AutoDeploy\Controller\IndexController'
-         ),
-     ),
-
-     // The following section is new and should be added to your file
-     'router' => array(
-         'routes' => array(
-            // The following is the only route we allow by default with this module
-            'AutoDeploy' => array(
-                'type'    => 'Segment',
-                'options' => array(
-                    'route' => '/auto-deploy[/]',
-                    'defaults' => array(
-                        '__NAMESPACE__' => 'AutoDeploy\Controller',
-                        'controller' => 'Index',
-                        'action' => 'index',
-                    ),
-                ),
-                'may_terminate' => true,
-            ),
-         ),
-     ),
  );
