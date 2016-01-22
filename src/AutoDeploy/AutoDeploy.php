@@ -6,39 +6,71 @@
  * @license   http://www.totallycommunications.com/license/bsd.txt New BSD License
  * @version   $Id:$
  */
-namespace AutoDeploy\Controller;
+namespace AutoDeploy;
 
 use AutoDeploy\Application\SystemEmailInterface;
 use AutoDeploy\Exception\InvalidArgumentException;
 use AutoDeploy\Service\ServiceManager;
-use AutoDeploy\Vcs\VcsFactory;
 use Zend\Json\Json;
 use Zend\Log\Logger;
 use Zend\Log\LoggerInterface;
 use Zend\Log\Writer\Stream;
-use Zend\Mvc\Controller\AbstractActionController;
-use Zend\View\Model\ViewModel;
 
-class IndexController extends AbstractActionController
+class AutoDeploy
 {
-    /**
-     * @var \Zend_Application
-     */
-    protected $application;
-
     /**
      * @var ServiceManager
      */
     protected $autoDeployServiceManager;
 
     /**
-     * @return \Zend\Stdlib\ResponseInterface
-     *
+     * @var array
+     */
+    protected $config = array();
+
+    public function __construct(array $config = array())
+    {
+        $this->config = $config;
+    }
+
+    /**
+     * Ip restriction
+     */
+    protected function preRun()
+    {
+        $remoteAddr = $_SERVER['REMOTE_ADDR'];
+
+        // check IP address is allowed
+        $config = $this->getConfig();
+        $autoDeployConfig = $config['auto_deploy'];
+        $allowedIpAddresses = $autoDeployConfig['ipAddresses'];
+
+        // error if ip is not allowed
+        if (!is_array($allowedIpAddresses) ||
+            !in_array($remoteAddr, $allowedIpAddresses, true)) {
+
+            /**
+             * @todo return 403
+             */
+
+            exit;
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfig()
+    {
+        return $this->config;
+    }
+
+    /**
      * @throws \AutoDeploy\Exception\InvalidArgumentException
      */
-    public function indexAction()
+    public function run()
     {
-        $this->layout('layout/output.phtml');
+        $this->preRun();
 
         // get request
         $request = file_get_contents('php://input');
@@ -50,8 +82,7 @@ class IndexController extends AbstractActionController
             exit;
         }
 
-        $application = $this->getServiceLocator()->get('Application');
-        $config = $application->getConfig();
+        $config = $this->getConfig();
         $autoDeployConfig = $config['auto_deploy'];
 
         try {
@@ -84,16 +115,16 @@ class IndexController extends AbstractActionController
         // create log message
         // we can assume that the config branch is correct at this point
         $log = "Branch: " . $autoDeployConfig['services']['vcs']['branch'] . "\n"
-             . "Num Commits: " . count($request->commits) . "\n"
-             . "Commits:\n";
+            . "Num Commits: " . count($request->commits) . "\n"
+            . "Commits:\n";
 
         if (is_array($request->commits)) {
             foreach ($request->commits AS $commit) {
                 $log .= "\n" . $commit->timestamp
-                      . "\n" . $commit->id
-                      . "\n" . $commit->author->name . " - "
-                      . $commit->author->email . "\n"
-                      . rtrim($commit->message, "\n") . "\n";
+                    . "\n" . $commit->id
+                    . "\n" . $commit->author->name . " - "
+                    . $commit->author->email . "\n"
+                    . rtrim($commit->message, "\n") . "\n";
             }
         }
 
@@ -101,11 +132,6 @@ class IndexController extends AbstractActionController
 
         $this->log($log);
         $this->mailLog($log, $request);
-
-        $response = $this->getResponse();
-        $response->setStatusCode(200);
-        $response->setContent($log);
-        return $response;
     }
 
     /**
@@ -114,8 +140,8 @@ class IndexController extends AbstractActionController
     protected function getAutoDeployServiceManager()
     {
         if ($this->autoDeployServiceManager === null) {
-            $application = $this->getApplication();
-            $this->autoDeployServiceManager = new ServiceManager($application->getConfig()['auto_deploy']);
+            $config = $this->getConfig();
+            $this->autoDeployServiceManager = new ServiceManager($config['auto_deploy']);
         }
 
         return $this->autoDeployServiceManager;
@@ -127,11 +153,13 @@ class IndexController extends AbstractActionController
      * @param string $message
      * @param boolean $error
      * @return void
+     *
+     * @throws InvalidArgumentException
      */
     protected function log($message, $error = false)
     {
-        $application = $this->getApplication();
-        $autoDeployConfig = $application->getConfig()['auto_deploy'];
+        $config = $this->getConfig();
+        $autoDeployConfig = $config['auto_deploy'];
 
         // Log is enabled by default
         if (!$autoDeployConfig['log']['enabled']) {
@@ -179,8 +207,8 @@ class IndexController extends AbstractActionController
      */
     protected function mailLog($message = '', \stdClass $request)
     {
-        $application = $this->getApplication();
-        $autoDeployConfig = $application->getConfig()['auto_deploy'];
+        $config = $this->getConfig();
+        $autoDeployConfig = $config['auto_deploy'];
 
         if (!$autoDeployConfig['log']['mail']) {
             return;
@@ -198,7 +226,7 @@ class IndexController extends AbstractActionController
 
         // send copy of log to recipients
         $subject = '[AutoDeploy] - ' . $_SERVER['HTTP_HOST'];
-        $mail = new $autoDeployConfig['log']['mailerClass']($application->getConfig()['application']['email']);
+        $mail = new $autoDeployConfig['log']['mailerClass']($config['application']['email']);
 
         if (!$mail instanceof SystemEmailInterface) {
             throw new InvalidArgumentException(sprintf(
@@ -208,17 +236,5 @@ class IndexController extends AbstractActionController
         }
 
         $mail->send($recipients, $subject, $message);
-    }
-
-    /**
-     * @return \Zend_Application
-     */
-    protected function getApplication()
-    {
-        if ($this->application === null) {
-            $this->application = $this->getServiceLocator()->get('Application');
-        }
-
-        return $this->application;
     }
 }
