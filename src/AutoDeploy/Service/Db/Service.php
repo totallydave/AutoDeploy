@@ -111,7 +111,7 @@ class Service extends AbstractService implements DbServiceInterface
         if (!$this->isDbServiceUpdateRequired()) {
             $config = $this->getConfig();
             $log .= sprintf(
-                'There are no new db migration files in "%s"',
+                'There are no new db migration files in "%s"' . "\n",
                 $config['migrationDir']
             );
 
