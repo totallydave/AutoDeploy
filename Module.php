@@ -22,6 +22,12 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
         $eventManager = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
+
+        $eventManager->attach(
+            MvcEvent::EVENT_DISPATCH,
+            array($this,'preDispatch'),
+            100
+        );
     }
 
     public function getConfig()
@@ -49,7 +55,7 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
         $application = $event->getApplication();
         $config = $application->getConfig();
         $autoDeployConfig = $config['auto_deploy'];
-        $allowedIpAddresses = $autoDeployConfig['allowedIpAddresses'];
+        $allowedIpAddresses = $autoDeployConfig['ipAddresses'];
 
         // error if ip is not allowed
         if (!in_array($remoteAddr, $allowedIpAddresses, true)) {
