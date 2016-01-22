@@ -11,7 +11,7 @@ namespace AutoDeploy\Controller;
 use AutoDeploy\AutoDeploy;
 use Zend\Mvc\Controller\AbstractActionController;
 
-class IndexController extends AbstractActionController
+class Zf2Controller extends AbstractActionController
 {
     /**
      * @return \Zend\Stdlib\ResponseInterface
@@ -22,16 +22,12 @@ class IndexController extends AbstractActionController
     {
         $this->layout('layout/output.phtml');
 
-        try {
-            $autoDeploy = new AutoDeploy($this->getApplication()->getConfig());
-            $log = $autoDeploy->run();
-        } catch (\Exception $e) {
-
-        }
+        $autoDeploy = new AutoDeploy($this->getApplication()->getConfig());
+        $autoDeploy->run();
 
         $response = $this->getResponse();
         $response->setStatusCode(200);
-        $response->setContent($log);
+
         return $response;
     }
 

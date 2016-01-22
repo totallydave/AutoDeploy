@@ -35,7 +35,9 @@ abstract class AbstractServiceFactory implements ServiceFactoryInterface
         }
 
         // late static binding
-        $serviceClassName = '\\' . substr(get_called_class(), 0, strrpos(get_called_class(), '\\')) . '\Service';
+        $serviceClassName = '\\' . substr(get_called_class(), 0, strrpos(get_called_class(), '\\'))
+                          . '\Service';
+
         $service = new $serviceClassName($config);
 
         $type = strtolower($service->getType());

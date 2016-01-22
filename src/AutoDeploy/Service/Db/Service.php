@@ -16,7 +16,7 @@ class Service extends AbstractService implements DbServiceInterface
     /**
      * @var array
      */
-    protected $updatedFiles = [];
+    protected $updatedFiles = array();
 
     public function __construct($service)
     {
@@ -56,7 +56,7 @@ class Service extends AbstractService implements DbServiceInterface
                             $config['migrationDir'] :
                             $config['migrationDir'] . DIRECTORY_SEPARATOR;
 
-        $dirFiles = [];
+        $dirFiles = array();
         foreach ($files as $file) {
             if ($file === '.' || $file === '..' ||
                 // we only want the files with the correct naming convention
@@ -75,7 +75,7 @@ class Service extends AbstractService implements DbServiceInterface
      */
     protected function isDbServiceUpdateRequired()
     {
-        $updatedFiles = [];
+        $updatedFiles = array();
         $migrationDirectoryFiles = $this->getMigrationDirFiles(true);
         $migrationDirectoryFilesFlipped = array_flip($migrationDirectoryFiles);
 
@@ -92,6 +92,8 @@ class Service extends AbstractService implements DbServiceInterface
 
     /**
      * @return void
+     *
+     * @throws \Exception
      */
     public function execute()
     {
@@ -99,7 +101,7 @@ class Service extends AbstractService implements DbServiceInterface
 
         // is there a vcs change?
         if (!$this->hasVcsUpdated()) {
-            $log .= $this->getVcsService()->getType() . ' has not been updated so no new db migration files';
+            $log .= $this->getVcsService()->getType() . " has not been updated so no new db migration files\n";
 
             $this->setLog($log);
             // nothing to do here
@@ -107,9 +109,10 @@ class Service extends AbstractService implements DbServiceInterface
         }
 
         if (!$this->isDbServiceUpdateRequired()) {
+            $config = $this->getConfig();
             $log .= sprintf(
                 'There are no new db migration files in "%s"',
-                $this->getConfig()['migrationDir']
+                $config['migrationDir']
             );
 
             $this->setLog($log);

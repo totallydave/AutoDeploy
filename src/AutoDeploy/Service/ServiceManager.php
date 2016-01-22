@@ -19,23 +19,23 @@ class ServiceManager implements ServiceManagerInterface
     /**
      * @var array
      */
-    protected static $serviceNamespaces = [
+    protected static $serviceNamespaces = array(
         self::SERVICE_TYPE_VCS => 'AutoDeploy\Service\Vcs',
         self::SERVICE_TYPE_DM => 'AutoDeploy\Service\Dm',
         self::SERVICE_TYPE_DB => 'AutoDeploy\Service\Db',
-    ];
+    );
 
     /**
      * @var array
      */
-    protected $services = [];
+    protected $services = array();
 
     /**
      * @var string
      */
     protected $log;
 
-    public function __construct(array $config = [])
+    public function __construct(array $config = array())
     {
         if (!array_key_exists('services', $config)) {
             throw new InvalidArgumentException("'services' config not found");
@@ -72,11 +72,11 @@ class ServiceManager implements ServiceManagerInterface
             // we want to force the db service to be the last this updated
             if ($serviceName === static::SERVICE_TYPE_DB) {
                 $databaseService = call_user_func_array(
-                    [static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'], [$serviceConfig]
+                    array(static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'), array($serviceConfig)
                 );
             } else {
                 $this->services[$serviceName] = call_user_func_array(
-                    [static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'], [$serviceConfig]
+                    array(static::$serviceNamespaces[$serviceName] . '\ServiceFactory', 'factory'), array($serviceConfig)
                 );
             }
         }
@@ -141,11 +141,11 @@ class ServiceManager implements ServiceManagerInterface
         if ($this->log === null) {
             $log = '';
 
-            $summary = [
-                'successful' => [],
-                'failed' => [],
-                'rolledBack' => [],
-            ];
+            $summary = array(
+                'successful' => array(),
+                'failed' => array(),
+                'rolledBack' => array(),
+            );
 
             foreach ($this->services as $service) {
                 $log .= '------------------------ ' . $service->getType() . ' start';

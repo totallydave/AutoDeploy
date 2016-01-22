@@ -73,7 +73,7 @@
 
      'controllers' => array(
          'invokables' => array(
-             'AutoDeploy\Controller\Index' => 'AutoDeploy\Controller\IndexController'
+             'AutoDeploy\Controller\Zf2' => 'AutoDeploy\Controller\Zf2Controller'
          ),
      ),
 
@@ -87,7 +87,7 @@
                     'route' => '/auto-deploy[/]',
                     'defaults' => array(
                         '__NAMESPACE__' => 'AutoDeploy\Controller',
-                        'controller' => 'Index',
+                        'controller' => 'Zf2',
                         'action' => 'index',
                     ),
                 ),

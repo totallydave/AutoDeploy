@@ -34,7 +34,7 @@ class AutoDeploy
     }
 
     /**
-     *
+     * Ip restriction
      */
     protected function preRun()
     {
@@ -132,8 +132,6 @@ class AutoDeploy
 
         $this->log($log);
         $this->mailLog($log, $request);
-
-        return $log;
     }
 
     /**

@@ -96,7 +96,7 @@ class Service extends AbstractService implements VcsServiceInterface
      */
     public function getUpdatedFiles()
     {
-        return [];
+        return array();
     }
 
     /**

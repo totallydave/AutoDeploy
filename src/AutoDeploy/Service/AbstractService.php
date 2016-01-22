@@ -66,7 +66,7 @@ abstract class AbstractService implements ServiceInterface
     /**
      * @param array $config
      */
-    public function parseConfig(array $config = [])
+    public function parseConfig(array $config = array())
     {
         $this->config = $config;
         $this->type = $config['type'];
@@ -85,7 +85,7 @@ abstract class AbstractService implements ServiceInterface
      *
      * @return array
      */
-    public function setConfig(array $config = [])
+    public function setConfig(array $config = array())
     {
         $this->config = $config;
     }
