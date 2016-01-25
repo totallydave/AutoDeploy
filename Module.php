@@ -22,12 +22,6 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
         $eventManager = $e->getApplication()->getEventManager();
         $moduleRouteListener = new ModuleRouteListener();
         $moduleRouteListener->attach($eventManager);
-
-        $eventManager->attach(
-            MvcEvent::EVENT_DISPATCH,
-            array($this,'preDispatch'),
-            100
-        );
     }
 
     public function getConfig()
@@ -44,43 +38,5 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
                 ),
             ),
         );
-    }
-
-    public function preDispatch($event)
-    {
-        // this is ugly but will do for now - ideally this
-        // only gets called for this module
-        if ($event->getRouteMatch()->getMatchedRouteName() !== 'AutoDeploy') {
-            return;
-        }
-
-        $request = $event->getRequest();
-        $remoteAddr = $request->getServer('REMOTE_ADDR');
-
-        // check IP address is allowed
-        $application = $event->getApplication();
-        $config = $application->getConfig();
-        $autoDeployConfig = $config['auto_deploy'];
-        $allowedIpAddresses = $autoDeployConfig['ipAddresses'];
-
-        // error if ip is not allowed
-        if (!in_array($remoteAddr, $allowedIpAddresses, true)) {
-            $baseModel = new \Zend\View\Model\ViewModel();
-            $baseModel->setTemplate('layout/output');
-
-            $model = new \Zend\View\Model\ViewModel();
-            $model->setTemplate('error/403');
-
-            $baseModel->addChild($model);
-            $baseModel->setTerminal(true);
-
-            $event->setViewModel($baseModel);
-
-            $response = $event->getResponse();
-            $response->setStatusCode(403);
-            $response->sendHeaders();
-            $event->setResponse($response);
-            exit;
-        }
     }
 }
