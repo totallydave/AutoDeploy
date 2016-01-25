@@ -48,6 +48,12 @@ class Module implements AutoloaderProviderInterface, ConfigProviderInterface
 
     public function preDispatch($event)
     {
+        // this is ugly but will do for now - ideally this
+        // only gets called for this module
+        if ($event->getRouteMatch()->getMatchedRouteName() !== 'AutoDeploy') {
+            return;
+        }
+
         $request = $event->getRequest();
         $remoteAddr = $request->getServer('REMOTE_ADDR');
 
