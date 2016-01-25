@@ -196,7 +196,7 @@ Replace the values in [] below - i.e. [GIT BRANCH]
 
          'log' => array(
              'enabled' => true,
-             'logger' => 'Zend\Log\Logger', // default use the Zend Logger (must be implement Zend\Log\LogInterface)
+             'logger' => 'Zend_Log', // default use the Zend Log
              'logDir' => 'var/log', // directory that the log file lives in
              'logFile' => 'application.log', // log file name
              'logTitle' => 'AutoDeploy', // log entry title
