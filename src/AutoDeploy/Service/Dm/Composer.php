@@ -10,7 +10,6 @@ namespace AutoDeploy\Service\Dm;
 
 use AutoDeploy\Exception\InvalidArgumentException;
 use AutoDeploy\Exception\RuntimeException;
-use Zend\Json\Json;
 
 class Composer extends Service
 {
@@ -69,7 +68,7 @@ class Composer extends Service
                             . 'composer.json';
 
             if (file_exists($composerConfig)) {
-                $composerConfig = Json::decode(file_get_contents($composerConfig));
+                $composerConfig = \Zend_Json::decode(file_get_contents($composerConfig), \Zend_Json::TYPE_OBJECT);
 
                 if (!empty($composerConfig->name) && $composerConfig->name == $config['name']) {
                     echo "found composer.json at $dir";
