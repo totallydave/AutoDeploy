@@ -8,11 +8,6 @@
  */
 namespace AutoDeploy\Application;
 
-use Zend\Mail\Message;
-use Zend\Mime\Message as MimeMessage;
-use Zend\Mime\Part as MimePart;
-use Zend\Mail\Transport\Sendmail as SendmailTransport;
-
 class SystemEmail implements SystemEmailInterface
 {
     public $fromName = '';
@@ -67,66 +62,53 @@ class SystemEmail implements SystemEmailInterface
         // do replacements in subject
         $subject = preg_replace($this->patterns, $this->replacements, $subject);
 
-        $message = new Message();
-        $message->addFrom($fromEmail, $fromName)
-            ->setSubject($subject);
+        $mail = new \Zend_Mail();
+        $tr = new \Zend_Mail_Transport_Sendmail('-f' . $fromEmail);
+        \Zend_Mail::setDefaultTransport($tr);
+
+        $mail->setFrom($fromEmail, $fromName);
+        $mail->setSubject(stripslashes($subject));
+
+        // make HTML email content
+        $html_content = $this->htmlContent($content);
+
+        // make text email content
+        $text_content = strip_tags($html_content);
+
+        $mail->setBodyText($text_content);
+        $mail->setBodyHtml($html_content);
 
         if (is_array($toEmail)) {
             foreach ($toEmail as $email) {
-                $this->addEmail($message, $email);
+                $this->addEmail($mail, $email);
             }
         } else {
-            $this->addEmail($message, $toEmail);
-        }
-
-        $addressList = $message->getTo();
-        if (!count($addressList)) {
-            return false;
+            $this->addEmail($mail, $toEmail);
         }
 
         if (is_array($this->ccEmail)) {
-            foreach ($this->ccEmail as $email) {
-                $message->addCc($email);
+            foreach($this->ccEmail as $email) {
+                $mail->addCc($email);
             }
-        } else if ($this->ccEmail) {
-            $message->addCc($this->ccEmail);
+        } else if($this->ccEmail) {
+            $mail->addCc($this->ccEmail);
         }
 
-        if (is_array($this->bccEmail)) {
-            foreach ($this->bccEmail as $email) {
-                $message->addBcc($email);
+        if(is_array($this->bccEmail)) {
+            foreach($this->bccEmail as $email) {
+                $mail->addBcc($email);
             }
-        } else if ($this->bccEmail) {
-            $message->addBcc($this->bccEmail);
+        } else if($this->bccEmail) {
+            $mail->addBcc($this->bccEmail);
         }
 
-        // define body
-        // make text email content
-        $content = nl2br($content);
-        $textContent = strip_tags($content);
-        $textPart = new MimePart($textContent);
-        $textPart->type = "text/plain";
+        $mail->setReturnPath($this->replyTo);
 
-        // make HTML email content
-        $htmlContent = $this->htmlContent($content);
-        $htmlPart = new MimePart($htmlContent);
-        $htmlPart->type = "text/html";
-
-        $body = new MimeMessage();
-        $body->setParts(array($textPart, $htmlPart));
-
-        $message->setBody($body);
-        $message->setEncoding('UTF-8');
-        $message->getHeaders()
-            ->get('content-type')
-            ->setType('multipart/alternative');
-
-
-        $transport = new SendmailTransport('-f' . $this->replyTo);
-
-        $transport->send($message);
-
-        return true;
+        if ($mail->send()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -143,7 +125,7 @@ class SystemEmail implements SystemEmailInterface
 
         // make HTML email content
         $htmlContent = $this->html_header();
-        $htmlContent.= $content;
+        $htmlContent.= nl2br($content);
         $htmlContent.= $this->html_footer();
 
         return $htmlContent;
@@ -231,22 +213,21 @@ class SystemEmail implements SystemEmailInterface
      * Proxy method to $message->addTo($email). Make sure, if we're on dev
      * environment that only authorises email addresses are added.
      *
-     * @param \Zend\Mail\Message $message
      * @param string $email
      *
      * @return void
      */
-    protected function addEmail($message, $email)
+    protected function addEmail($mail, $email)
     {
         if (getenv('env') === 'dev') {
             // only authorise TC email's address
             foreach ($this->allowedDevEmailDomains as $domain) {
                 if (preg_match('/' . $domain . '$/', $email)) {
-                    $message->addTo($email);
+                    $mail->addTo($email);
                 }
             }
         } else {
-            $message->addTo($email);
+            $mail->addTo($email);
         }
     }
 }

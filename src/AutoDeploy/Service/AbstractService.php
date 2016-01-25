@@ -8,6 +8,8 @@
  */
 namespace AutoDeploy\Service;
 
+use AutoDeploy\Application\Log;
+use AutoDeploy\AutoDeploy;
 use AutoDeploy\Exception\InvalidArgumentException;
 
 abstract class AbstractService implements ServiceInterface
@@ -33,7 +35,7 @@ abstract class AbstractService implements ServiceInterface
     protected $hasRolledBack = false;
 
     /**
-     * @var String
+     * @var Log
      */
     protected $log;
 
@@ -47,7 +49,11 @@ abstract class AbstractService implements ServiceInterface
      */
     protected $type;
 
-    public function __construct($service)
+    /**
+     * @param $service
+     * @param Log $log
+     */
+    public function __construct($service, Log $log)
     {
         if (is_array($service)) {
             $this->parseConfig($service);
@@ -61,6 +67,16 @@ abstract class AbstractService implements ServiceInterface
                 (is_object($service) ? get_class($service) : gettype($service))
             ));
         }
+
+        $this->log = $log;
+    }
+
+    /**
+     * @return AutoDeploy
+     */
+    public function getAutoDeploy()
+    {
+        return $this->autoDeploy;
     }
 
     /**
@@ -107,9 +123,9 @@ abstract class AbstractService implements ServiceInterface
     }
 
     /**
-     * @param string $log
+     * @param Log $log
      */
-    public function setLog($log = '')
+    public function setLog(Log $log)
     {
         $this->log = $log;
     }
@@ -193,7 +209,9 @@ abstract class AbstractService implements ServiceInterface
      */
     public function getVcsService()
     {
-        return $this->getServiceManager()->getService(ServiceManager::SERVICE_TYPE_VCS);
+        return $this->getServiceManager()->getService(
+            ServiceManager::SERVICE_TYPE_VCS
+        );
     }
 
     /**
@@ -234,7 +252,7 @@ abstract class AbstractService implements ServiceInterface
             return;
         }
 
-        $this->setLog($this->getLog() . '<<<<<<<< ROLL BACK');
+        $this->getLog()->addMessage('<<<<<<<< ROLL BACK');
         $this->executeRollback();
         $this->setHasRolledBack(true);
     }

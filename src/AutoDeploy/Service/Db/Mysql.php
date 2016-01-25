@@ -92,7 +92,6 @@ class Mysql extends Service
         // swap to project root
         chdir($projectRoot);
 
-        $log = $this->getLog() . "\n";
         $config = $this->getConfig();
         $connections = $config['backup_connections'];
 
@@ -121,7 +120,9 @@ class Mysql extends Service
                     $config['backupDir'] . DIRECTORY_SEPARATOR;
 
         // lets get the pre and post run unique id from vcs so the backup files can be identified
-        $backupDumpFileId = $this->getVcsService()->getPreRunUniqueId() . '-' . $this->getVcsService()->getPostRunUniqueId() . '-' . time();
+        $backupDumpFileId = $this->getVcsService()->getPreRunUniqueId()
+                          . '-' . $this->getVcsService()->getPostRunUniqueId()
+                          . '-' . time();
 
         $success = true;
         foreach ($connections as $backupConfig) {
@@ -130,9 +131,12 @@ class Mysql extends Service
             $password = $backupConfig['password'];
             $database = $backupConfig['database'];
 
-            $dumpFile = $backupDir . $backupConfig['database'] . '_' . $backupDumpFileId . '.sql';
+            $dumpFile = $backupDir . $backupConfig['database']
+                      . '_' . $backupDumpFileId . '.sql';
 
-            $log .= "Creating dump file '$dumpFile' for database '$database'\n";
+            $this->getLog()->addMessage(
+                "Creating dump file '$dumpFile' for database '$database'"
+            );
 
             $sql = "mysqldump -u$username -h$host -p$password $database > $dumpFile 2>&1";
 
@@ -147,15 +151,17 @@ class Mysql extends Service
                 $success = false;
             }
 
-            $log .= "Result of mysql dump: \n";
+            $message = "Result of mysql dump: \n";
             if (is_array($result)) {
-                $log .= implode("\n", $result) . "\n";
+                $message .= implode("\n", $result) . "\n";
             } elseif (is_string($result)) {
-                $log .= $result . "\n";
+                $message .= $result . "\n";
             }
-        }
 
-        $this->setLog($log);
+            $this->getLog()->addMessage(
+                $message
+            );
+        }
 
         if (!$success) {
             throw new RuntimeException("Mysql dump was unsuccessful : " . $this->getLog());

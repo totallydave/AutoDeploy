@@ -8,6 +8,7 @@
  */
 namespace AutoDeploy\Service;
 
+use AutoDeploy\Application\Log;
 use AutoDeploy\Exception\InvalidArgumentException;
 
 abstract class AbstractServiceFactory implements ServiceFactoryInterface
@@ -35,10 +36,11 @@ abstract class AbstractServiceFactory implements ServiceFactoryInterface
         }
 
         // late static binding
-        $serviceClassName = '\\' . substr(get_called_class(), 0, strrpos(get_called_class(), '\\'))
+        $serviceClassName = '\\'
+                          . substr(get_called_class(), 0, strrpos(get_called_class(), '\\'))
                           . '\Service';
 
-        $service = new $serviceClassName($config);
+        $service = new $serviceClassName($config, new Log());
 
         $type = strtolower($service->getType());
         if (!$type && $defaultType) {
@@ -54,10 +56,11 @@ abstract class AbstractServiceFactory implements ServiceFactoryInterface
 
         if ($type && isset(static::$typeClasses[$type])) {
             $class = static::$typeClasses[$type];
-            $service = new $class($service);
+            $service = new $class($service, new Log());
             if (!$service instanceof ServiceInterface) {
                 throw new InvalidArgumentException(sprintf(
-                    'class "%s" registered for type "%s" does not implement AutoDeploy\Service\ServiceInterface',
+                    'class "%s" registered for type "%s" does not '
+                    . 'implement AutoDeploy\Service\ServiceInterface',
                     $class,
                     $type
                 ));

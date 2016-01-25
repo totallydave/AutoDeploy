@@ -9,6 +9,7 @@
 namespace AutoDeploy\Service\Vcs;
 
 use AutoDeploy\Service\AbstractService;
+use AutoDeploy\Application\Log;
 
 class Service extends AbstractService implements VcsServiceInterface
 {
@@ -24,10 +25,11 @@ class Service extends AbstractService implements VcsServiceInterface
 
     /**
      * @param $service
+     * @param Log $log
      */
-    public function __construct($service)
+    public function __construct($service, Log $log)
     {
-        parent::__construct($service);
+        parent::__construct($service, $log);
 
         $this->setPreRunUniqueId($this->getUniqueId());
     }

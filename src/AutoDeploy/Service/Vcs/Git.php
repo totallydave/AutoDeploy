@@ -38,8 +38,8 @@ class Git extends Service
         // check current branch matches expected auto_deploy branch
         if ($currentBranch != $this->config['branch']) {
             $message = 'Current branch "' . $currentBranch . '" does not '
-                . 'match excepted auto deploy branch "'
-                . $this->config['branch'] . '"';
+                     . 'match excepted auto deploy branch "'
+                     . $this->config['branch'] . '"';
 
             throw new InvalidArgumentException($message);
         }
@@ -64,12 +64,14 @@ class Git extends Service
             $gitPull = implode("\n", $gitPull);
         }
 
-        $log = "\nResult of git reset:\n"
-            . $gitReset . "\n"
-            . "\nResult of git pull:\n"
-            . $gitPull . "\n";
+        $message = "Result of git reset:\n"
+                 . $gitReset . "\n"
+                 . "\nResult of git pull:\n"
+                 . $gitPull;
 
-        $this->log = $log;
+        $this->getLog()->addMessage(
+            $message
+        );
     }
 
     /**
@@ -188,6 +190,8 @@ class Git extends Service
             );
         }
 
-        $this->setLog($this->getLog() . "\nGit Rollback: " . $gitRollback);
+        $this->getLog()->addMessage(
+            "Git Rollback: " . $gitRollback
+        );
     }
 }

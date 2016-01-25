@@ -18,11 +18,7 @@
     },
     "require": {
         "php": ">=5.3",
-        "zendframework/zend-mail": ">=2.3",
-        "zendframework/zend-mime": ">=2.3",
-        "zendframework/zend-log": ">= 2.3",
-        "zendframework/zend-mvc": ">= 2.3",
-        "zendframework/zend-json": ">= 2.3"
+        "zendframework/zendframework1": ">= 1.12"
     },
     "autoload": {
         "psr-0": {

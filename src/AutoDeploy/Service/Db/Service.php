@@ -10,6 +10,7 @@ namespace AutoDeploy\Service\Db;
 
 use AutoDeploy\Service\AbstractService;
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Application\Log;
 
 class Service extends AbstractService implements DbServiceInterface
 {
@@ -18,9 +19,9 @@ class Service extends AbstractService implements DbServiceInterface
      */
     protected $updatedFiles = array();
 
-    public function __construct($service)
+    public function __construct($service, Log $log)
     {
-        parent::__construct($service);
+        parent::__construct($service, $log);
 
         $config = $this->getConfig();
 
@@ -97,26 +98,28 @@ class Service extends AbstractService implements DbServiceInterface
      */
     public function execute()
     {
-        $log = $this->getLog() . "\n";
-
         // is there a vcs change?
         if (!$this->hasVcsUpdated()) {
-            $log .= $this->getVcsService()->getType() . " has not been updated so no new db migration files\n";
+            $message = $this->getVcsService()->getType()
+                     . " has not been updated so no new db migration files";
 
-            $this->setLog($log);
+            $this->getLog()->addMessage(
+                $message
+            );
             // nothing to do here
             return;
         }
 
         if (!$this->isDbServiceUpdateRequired()) {
             $config = $this->getConfig();
-            $log .= sprintf(
+            $message = sprintf(
                 'There are no new db migration files in "%s"' . "\n",
                 $config['migrationDir']
             );
 
-            $this->setLog($log);
-
+            $this->getLog()->addMessage(
+                $message
+            );
             return;
         }
 
@@ -124,10 +127,12 @@ class Service extends AbstractService implements DbServiceInterface
             $this->executeBackup();
             $this->executeMigration();
         } catch (\Exception $e) {
-            $log .= "\n---------------ERROR---------------\n"
-                  . $e->getMessage() . "\n";
+            $message = "---------------ERROR---------------\n"
+                     . $e->getMessage();
 
-            $this->setLog($log);
+            $this->getLog()->addMessage(
+                $message
+            );
 
             // this will get caught in the controller if exception is thrown
             $this->getServiceManager()->rollBack();

@@ -37,14 +37,16 @@ class Composer extends Service
         system("composer update --no-dev 2>&1");
         $composerUpdate = ob_get_clean();
 
-        $log = "\nResult of composer update:\n";
+        $message = "Result of composer update:\n";
         if (is_array($composerUpdate)) {
-            $log .= implode("\n", $composerUpdate) . "\n";
+            $message .= implode("\n", $composerUpdate) . "\n";
         } elseif (is_string($composerUpdate)) {
-            $log .= $composerUpdate . "\n";
+            $message .= $composerUpdate . "\n";
         }
 
-        $this->log = $log;
+        $this->getLog()->addMessage(
+            $message
+        );
     }
 
     /**
@@ -117,6 +119,8 @@ class Composer extends Service
             );
         }
 
-        $this->setLog($this->getLog() . "\nComposer Rollback: " . $composerUpdate);
+        $this->getLog()->addMessage(
+            'Composer Rollback: ' . $composerUpdate
+        );
     }
 }

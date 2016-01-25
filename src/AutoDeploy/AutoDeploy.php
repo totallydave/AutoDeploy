@@ -10,11 +10,8 @@ namespace AutoDeploy;
 
 use AutoDeploy\Application\SystemEmailInterface;
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Application\Log;
 use AutoDeploy\Service\ServiceManager;
-use Zend\Json\Json;
-use Zend\Log\Logger;
-use Zend\Log\LoggerInterface;
-use Zend\Log\Writer\Stream;
 
 class AutoDeploy
 {
@@ -28,9 +25,15 @@ class AutoDeploy
      */
     protected $config = array();
 
+    /**
+     * @var Log
+     */
+    protected $log;
+
     public function __construct(array $config = array())
     {
         $this->config = $config;
+        $this->log = new Log();
     }
 
     /**
@@ -66,6 +69,14 @@ class AutoDeploy
     }
 
     /**
+     * @return Log
+     */
+    public function getLog()
+    {
+        return $this->log;
+    }
+
+    /**
      * @throws \AutoDeploy\Exception\InvalidArgumentException
      */
     public function run()
@@ -76,9 +87,12 @@ class AutoDeploy
         $request = file_get_contents('php://input');
 
         if (!$request) {
-            $message = 'No request found';
-            $this->log($message, $request, true);
-            $this->mailLog($message, $request);
+            $log = $this->getLog()
+                        ->addMessage('No request found');
+
+            $this->log($log, $request, true);
+            $this->mailLog($log, $request);
+
             exit;
         }
 
@@ -86,19 +100,25 @@ class AutoDeploy
         $autoDeployConfig = $config['auto_deploy'];
 
         try {
-            $request = Json::decode($request);
+            $request = \Zend_Json::decode($request, \Zend_Json::TYPE_OBJECT);
         } catch (\Exception $e) {
-            $log = $e->getMessage();
+            $log = $this->getLog()
+                        ->addMessage($e->getMessage());
+
             $this->log($log, $request, true);
             $this->mailLog($log, $request);
+
             exit;
         }
 
         // We need auto_deploy config to be set
         if (!$autoDeployConfig) {
-            $message = 'No \'auto_deploy\' config found';
-            $this->log($message, $request, true);
-            $this->mailLog($message, $request);
+            $log = $this->getLog()
+                        ->addMessage('No \'auto_deploy\' config found');
+
+            $this->log($log, $request, true);
+            $this->mailLog($log, $request);
+
             exit;
         }
 
@@ -106,32 +126,36 @@ class AutoDeploy
             $serviceManager = $this->getAutoDeployServiceManager();
             $serviceManager->run();
         } catch (\Exception $e) {
-            $log = $e->getMessage() . $serviceManager->getLog();
+            $log = $this->getLog()
+                        ->addMessage($e->getMessage());
+
             $this->log($log, $request, true);
             $this->mailLog($log, $request);
+
             exit;
         }
 
         // create log message
         // we can assume that the config branch is correct at this point
-        $log = "Branch: " . $autoDeployConfig['services']['vcs']['branch'] . "\n"
-            . "Num Commits: " . count($request->commits) . "\n"
-            . "Commits:\n";
+        $this->getLog()
+             ->addMessage('Branch: ' . $autoDeployConfig['services']['vcs']['branch'])
+             ->addMessage('Num Commits: ' . count($request->commits))
+             ->addMessage('Commits:');
 
         if (is_array($request->commits)) {
             foreach ($request->commits AS $commit) {
-                $log .= "\n" . $commit->timestamp
-                    . "\n" . $commit->id
-                    . "\n" . $commit->author->name . " - "
-                    . $commit->author->email . "\n"
-                    . rtrim($commit->message, "\n") . "\n";
+                $this->getLog()->addMessage($commit->timestamp)
+                               ->addMessage($commit->id)
+                               ->addMessage($commit->author->name . " - " . $commit->author->email)
+                               ->addMessage(rtrim($commit->message, "\n"));
             }
         }
 
-        $log .= $serviceManager->getLog();
+        // get service manager log
+        $this->getLog()->addLog($serviceManager->getLog());
 
-        $this->log($log);
-        $this->mailLog($log, $request);
+        $this->log($this->getLog());
+        $this->mailLog($this->getLog(), $request);
     }
 
     /**
@@ -141,7 +165,7 @@ class AutoDeploy
     {
         if ($this->autoDeployServiceManager === null) {
             $config = $this->getConfig();
-            $this->autoDeployServiceManager = new ServiceManager($config['auto_deploy']);
+            $this->autoDeployServiceManager = new ServiceManager($config['auto_deploy'], new Log());
         }
 
         return $this->autoDeployServiceManager;
@@ -150,13 +174,13 @@ class AutoDeploy
     /**
      * Log output
      *
-     * @param string $message
+     * @param Log $log
      * @param boolean $error
      * @return void
      *
      * @throws InvalidArgumentException
      */
-    protected function log($message, $error = false)
+    protected function log(Log $log, $error = false)
     {
         $config = $this->getConfig();
         $autoDeployConfig = $config['auto_deploy'];
@@ -167,9 +191,9 @@ class AutoDeploy
         }
 
         // log to application log
-        $messageType = Logger::INFO;
+        $messageType = \Zend_Log::INFO;
         if ($error) {
-            $messageType = Logger::ERR;
+            $messageType = \Zend_Log::ERR;
         }
 
         $logDir = APPLICATION_ROOT . DIRECTORY_SEPARATOR . $autoDeployConfig['log']['logDir'];
@@ -183,29 +207,32 @@ class AutoDeploy
 
         $logger = new $autoDeployConfig['log']['logger']();
 
-        if (!$logger instanceof LoggerInterface) {
+        /*
+         * removed for zf1 migration
+         *
+         * if (!$logger instanceof LoggerInterface) {
             throw new InvalidArgumentException(sprintf(
                 'class "%s" registered as logger does not implement Zend\Log\LoggerInterface',
                 $logger
             ));
-        }
+        }*/
 
-        $writer = new Stream($logFile);
+        $writer = new \Zend_Log_Writer_Stream($logFile);
         $logger->addWriter($writer);
 
-        $logger->log($messageType, $message);
+        $logger->log($log->getOutputString(), $messageType);
     }
 
     /**
      * Log output
      *
-     * @param string $message
+     * @param Log $log
      * @param \stdClass $request
      * @return void
      *
      * @throws InvalidArgumentException
      */
-    protected function mailLog($message = '', \stdClass $request)
+    protected function mailLog(Log $log, \stdClass $request)
     {
         $config = $this->getConfig();
         $autoDeployConfig = $config['auto_deploy'];
@@ -235,6 +262,6 @@ class AutoDeploy
             ));
         }
 
-        $mail->send($recipients, $subject, $message);
+        $mail->send($recipients, $subject, $log->getOutputString());
     }
 }

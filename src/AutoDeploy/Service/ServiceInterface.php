@@ -8,6 +8,9 @@
  */
 namespace AutoDeploy\Service;
 
+use AutoDeploy\Application\Log;
+
+
 interface ServiceInterface
 {
     /**
@@ -38,9 +41,9 @@ interface ServiceInterface
     public function getType();
 
     /**
-     * @param string
+     * @param Log
      */
-    public function setLog($log = '');
+    public function setLog(Log $log);
 
     /**
      * @return String

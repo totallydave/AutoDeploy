@@ -9,6 +9,7 @@
 namespace AutoDeploy\Service;
 
 use AutoDeploy\Exception\InvalidArgumentException;
+use AutoDeploy\Application\Log;
 
 class ServiceManager implements ServiceManagerInterface
 {
@@ -31,11 +32,11 @@ class ServiceManager implements ServiceManagerInterface
     protected $services = array();
 
     /**
-     * @var string
+     * @var Log
      */
     protected $log;
 
-    public function __construct(array $config = array())
+    public function __construct(array $config = array(), Log $log)
     {
         if (!array_key_exists('services', $config)) {
             throw new InvalidArgumentException("'services' config not found");
@@ -97,6 +98,8 @@ class ServiceManager implements ServiceManagerInterface
 
             $service->setVcsService($this->services[static::SERVICE_TYPE_VCS]);
         }
+
+        $this->log = $log;
     }
 
     /**
@@ -121,6 +124,8 @@ class ServiceManager implements ServiceManagerInterface
         foreach ($this->services as $service) {
             $service->run();
         }
+
+        $this->generateLog();
     }
 
     /**
@@ -134,47 +139,48 @@ class ServiceManager implements ServiceManagerInterface
     }
 
     /**
-     * @return string
+     * @return void
+     */
+    protected function generateLog()
+    {
+        $summary = array(
+            'successful' => array(),
+            'failed' => array(),
+            'rolledBack' => array(),
+        );
+
+        $log = $this->getLog();
+        foreach ($this->services as $service) {
+
+            $log->addMessage('------------------------ ' . $service->getType() . ' start')
+                ->addLog($service->getLog())
+                ->addMessage('------------------------ ' . $service->getType() . ' end');
+
+            if ($service->getHasRun()) {
+                $summary['successful'][] = $service->getType();
+            } else {
+                $summary['failed'][] = $service->getType();
+            }
+
+            if ($service->getHasRolledBack()) {
+                $summary['rolledBack'][] = $service->getType();
+            }
+        }
+
+        $log->addMessage('------------------------ AutoDeploy summary')
+            ->addMessage("Successful services: \n" . implode("\n", $summary['successful']))
+            ->addMessage("Failed services: \n" . implode("\n", $summary['failed']));
+
+        if (count($summary['failed'])) {
+            $log->addMessage('Rolled Back services: \n"' . implode("\n", $summary['rolledBack']));
+        }
+    }
+
+    /**
+     * @return Log
      */
     public function getLog()
     {
-        if ($this->log === null) {
-            $log = '';
-
-            $summary = array(
-                'successful' => array(),
-                'failed' => array(),
-                'rolledBack' => array(),
-            );
-
-            foreach ($this->services as $service) {
-                $log .= '------------------------ ' . $service->getType() . ' start';
-                $log .= $service->getLog();
-                $log .= '------------------------ ' . $service->getType() . ' end';
-                $log .= "\n";
-
-                if ($service->getHasRun()) {
-                    $summary['successful'][] = $service->getType();
-                } else {
-                    $summary['failed'][] = $service->getType();
-                }
-
-                if ($service->getHasRolledBack()) {
-                    $summary['rolledBack'][] = $service->getType();
-                }
-            }
-
-            $log .= "------------------------ AutoDeploy summary\n"
-                  . "Successful services: \n" . implode("\n", $summary['successful']) . "\n"
-                  . "\nFailed services: \n" . implode("\n", $summary['failed']) . "\n";
-
-            if (count($summary['failed'])) {
-                $log .= "\nRolled Back services: \n" . implode("\n", $summary['rolledBack']);
-            }
-
-            $this->log = $log;
-        }
-
         return $this->log;
     }
 }
