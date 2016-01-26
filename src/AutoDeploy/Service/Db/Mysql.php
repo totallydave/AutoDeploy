@@ -28,7 +28,6 @@ class Mysql extends Service
         // swap to project root
         chdir($projectRoot);
 
-        $log = $this->getLog() . "\n";
         $config = $this->getConfig();
         $connection = $config['connection'];
 
@@ -47,7 +46,9 @@ class Mysql extends Service
 
         $success = true;
         foreach ($this->updatedFiles as $file) {
-            $log .= "Executing file '" . $file . "'\n";
+            $this->getLog()->addMessage(
+                "Executing file '" . $file
+            );
 
             $sqlStringToExecute = preg_replace("/\[FILE\]/", "$file", $sql);
 
@@ -62,15 +63,17 @@ class Mysql extends Service
                 $success = false;
             }
 
-            $log .= "Result of mysql update: \n";
+            $message = "Result of mysql update: \n";
             if (is_array($result)) {
-                $log .= implode("\n", $result) . "\n";
+                $message .= implode("\n", $result) . "\n";
             } elseif (is_string($result)) {
-                $log .= $result . "\n";
+                $message .= $result . "\n";
             }
-        }
 
-        $this->setLog($log);
+            $this->getLog()->addMessage(
+                $message
+            );
+        }
 
         if (!$success) {
             throw new RuntimeException("Mysql import was unsuccessful : " . $this->getLog());
